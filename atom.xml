@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title><![CDATA[wk's blog]]></title>
+  
+  <link href="/atom.xml" rel="self"/>
+  <link href="http://wk-j.gihub.io/"/>
+  <updated>2016-01-10T09:49:09.000Z</updated>
+  <id>http://wk-j.gihub.io/</id>
+  
+  <author>
+    <name><![CDATA[wk]]></name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[สวัสดีพ่อแม่พี่น้องชาวโลกทั้งหลาย]]></title>
+    <link href="http://wk-j.gihub.io/2016/01/10/jw/"/>
+    <id>http://wk-j.gihub.io/2016/01/10/jw/</id>
+    <published>2016-01-10T09:41:01.000Z</published>
+    <updated>2016-01-10T09:49:09.000Z</updated>
+    <content type="html"><![CDATA[<p>สร้างบล๊อกด้วย FSharp.Formatting</p>
+<p>บล๊อกนี้เขียนด้วย markdown ทั้งหมด ผมใช้วิธีแปลงไฟล์ .md เป็น .html ด้วย <a href="http://tpetricek.github.io/FSharp.Formatting/" target="_blank" rel="external">FSharp.Formatting</a></p>
+<h4 id="u0E02_u0E31_u0E49_u0E19_u0E15_u0E2D_u0E19"><a href="#u0E02_u0E31_u0E49_u0E19_u0E15_u0E2D_u0E19" class="headerlink" title="ขั้นตอน"></a>ขั้นตอน</h4><ul>
+<li>เขียน .md ด้วย atom เก็บไว้ในโฟลเดอร์ src</li>
+<li>แปลงไฟล์ .md เป็น .html และ commit ขึ้น github โดยใช้สคริปต์ build.sh</li>
+</ul>
+<h4 id="u0E44_u0E1F_u0E25_u0E4C_build-sh"><a href="#u0E44_u0E1F_u0E25_u0E4C_build-sh" class="headerlink" title="ไฟล์ build.sh"></a>ไฟล์ build.sh</h4><figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">fsharpi format.fsx</span><br><span class="line">cd ../blog</span><br><span class="line">git add --all</span><br><span class="line">git commit -m <span class="string">"update"</span></span><br><span class="line">git push -u origin gh-pages</span><br><span class="line">cd ../blog-source</span><br></pre></td></tr></table></figure>
+<h4 id="u0E44_u0E1F_u0E25_u0E4C_format-fsx"><a href="#u0E44_u0E1F_u0E25_u0E4C_format-fsx" class="headerlink" title="ไฟล์ format.fsx"></a>ไฟล์ format.fsx</h4><figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">#I <span class="string">"packages/FAKE/tools/"</span></span><br><span class="line">#r <span class="string">"FakeLib.dll"</span></span><br><span class="line"></span><br><span class="line">#load <span class="string">@"FSharp.Formatting.fsx"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">open</span> FSharp.Literate</span><br><span class="line"><span class="keyword">open</span> System.IO</span><br><span class="line"><span class="keyword">open</span> Fake.FileHelper</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> source = <span class="string">"src/md"</span></span><br><span class="line"><span class="keyword">let</span> resource = <span class="string">"resource"</span></span><br><span class="line"><span class="keyword">let</span> template = <span class="string">"src/html/template.html"</span></span><br><span class="line"><span class="keyword">let</span> indexTemplate = <span class="string">"src/html/indexTemplate.html"</span></span><br><span class="line"><span class="keyword">let</span> index = <span class="string">"src/md/index.md"</span></span><br><span class="line"><span class="keyword">let</span> output= <span class="string">"../blog"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> delete() =</span><br><span class="line">    DirectoryInfo(output).GetFiles(<span class="string">"*.html"</span>, SearchOption.AllDirectories)</span><br><span class="line">    |&gt; Seq.iter(<span class="keyword">fun</span> x -&gt; DeleteFile x.FullName)</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> format() =</span><br><span class="line">    Literate.ProcessMarkdown(index, indexTemplate, sprintf <span class="string">"%s/index.html"</span> output)</span><br><span class="line">    Literate.ProcessDirectory(source, template, output)</span><br><span class="line"><span class="keyword">let</span> deploy() =</span><br><span class="line">    CopyDir output resource (<span class="keyword">fun</span> x -&gt; <span class="keyword">true</span>)</span><br><span class="line"></span><br><span class="line">delete()</span><br><span class="line">format()</span><br><span class="line">deploy()</span><br></pre></td></tr></table></figure>
+<p>ไฟล์อื่นๆ สามารถเข้าไปดูใน <a href="https://github.com/wk-j/blog-source" target="_blank" rel="external">blog-source</a> ได้เลย</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>สร้างบล๊อกด้วย FSharp.Formatting</p>
+<p>บล๊อกนี้เขียนด้วย markdown ทั้งหมด ผมใช้วิธีแปลงไฟล์ .md เป็น .html ด้วย <a href="http://tpetrice]]>
+    </summary>
+    
+      <category term="jw, c#, f#, java" scheme="http://wk-j.gihub.io/tags/jw-c-f-java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[Hello World]]></title>
+    <link href="http://wk-j.gihub.io/2016/01/10/hello-world/"/>
+    <id>http://wk-j.gihub.io/2016/01/10/hello-world/</id>
+    <published>2016-01-10T08:24:17.000Z</published>
+    <updated>2016-01-10T08:24:17.000Z</updated>
+    <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
+<h2 id="Quick_Start"><a href="#Quick_Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create_a_new_post"><a href="#Create_a_new_post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
+<h3 id="Run_server"><a href="#Run_server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
+<h3 id="Generate_static_files"><a href="#Generate_static_files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
+<h3 id="Deploy_to_remote_sites"><a href="#Deploy_to_remote_sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.]]>
+    </summary>
+    
+  </entry>
+  
+</feed>
