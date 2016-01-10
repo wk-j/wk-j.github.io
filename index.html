@@ -42,55 +42,6 @@
   </div>
 </header>
     <section id="main" class="outer">
-      <article id="post-jw" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/01/10/jw/">สวัสดีพ่อแม่พี่น้องชาวโลกทั้งหลาย</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-meta">
-      <a href="/2016/01/10/jw/" class="article-date">
-  <time datetime="2016-01-10T09:41:01.000Z" itemprop="datePublished">2016-01-10</time>
-</a>
-      
-      
-    </div>
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>สร้างบล๊อกด้วย FSharp.Formatting</p>
-<p>บล๊อกนี้เขียนด้วย markdown ทั้งหมด ผมใช้วิธีแปลงไฟล์ .md เป็น .html ด้วย <a href="http://tpetricek.github.io/FSharp.Formatting/" target="_blank" rel="external">FSharp.Formatting</a></p>
-<h4 id="u0E02_u0E31_u0E49_u0E19_u0E15_u0E2D_u0E19"><a href="#u0E02_u0E31_u0E49_u0E19_u0E15_u0E2D_u0E19" class="headerlink" title="ขั้นตอน"></a>ขั้นตอน</h4><ul>
-<li>เขียน .md ด้วย atom เก็บไว้ในโฟลเดอร์ src</li>
-<li>แปลงไฟล์ .md เป็น .html และ commit ขึ้น github โดยใช้สคริปต์ build.sh</li>
-</ul>
-<h4 id="u0E44_u0E1F_u0E25_u0E4C_build-sh"><a href="#u0E44_u0E1F_u0E25_u0E4C_build-sh" class="headerlink" title="ไฟล์ build.sh"></a>ไฟล์ build.sh</h4><figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">fsharpi format.fsx</span><br><span class="line">cd ../blog</span><br><span class="line">git add --all</span><br><span class="line">git commit -m <span class="string">"update"</span></span><br><span class="line">git push -u origin gh-pages</span><br><span class="line">cd ../blog-source</span><br></pre></td></tr></table></figure>
-<h4 id="u0E44_u0E1F_u0E25_u0E4C_format-fsx"><a href="#u0E44_u0E1F_u0E25_u0E4C_format-fsx" class="headerlink" title="ไฟล์ format.fsx"></a>ไฟล์ format.fsx</h4><figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">#I <span class="string">"packages/FAKE/tools/"</span></span><br><span class="line">#r <span class="string">"FakeLib.dll"</span></span><br><span class="line"></span><br><span class="line">#load <span class="string">@"FSharp.Formatting.fsx"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">open</span> FSharp.Literate</span><br><span class="line"><span class="keyword">open</span> System.IO</span><br><span class="line"><span class="keyword">open</span> Fake.FileHelper</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> source = <span class="string">"src/md"</span></span><br><span class="line"><span class="keyword">let</span> resource = <span class="string">"resource"</span></span><br><span class="line"><span class="keyword">let</span> template = <span class="string">"src/html/template.html"</span></span><br><span class="line"><span class="keyword">let</span> indexTemplate = <span class="string">"src/html/indexTemplate.html"</span></span><br><span class="line"><span class="keyword">let</span> index = <span class="string">"src/md/index.md"</span></span><br><span class="line"><span class="keyword">let</span> output= <span class="string">"../blog"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> delete() =</span><br><span class="line">    DirectoryInfo(output).GetFiles(<span class="string">"*.html"</span>, SearchOption.AllDirectories)</span><br><span class="line">    |&gt; Seq.iter(<span class="keyword">fun</span> x -&gt; DeleteFile x.FullName)</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> format() =</span><br><span class="line">    Literate.ProcessMarkdown(index, indexTemplate, sprintf <span class="string">"%s/index.html"</span> output)</span><br><span class="line">    Literate.ProcessDirectory(source, template, output)</span><br><span class="line"><span class="keyword">let</span> deploy() =</span><br><span class="line">    CopyDir output resource (<span class="keyword">fun</span> x -&gt; <span class="keyword">true</span>)</span><br><span class="line"></span><br><span class="line">delete()</span><br><span class="line">format()</span><br><span class="line">deploy()</span><br></pre></td></tr></table></figure>
-<p>ไฟล์อื่นๆ สามารถเข้าไปดูใน <a href="https://github.com/wk-j/blog-source" target="_blank" rel="external">blog-source</a> ได้เลย</p>
-
-      
-    </div>
-    
-    
-      <footer class="article-footer">
-        
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/jw-c-f-java/">jw, c#, f#, java</a></li></ul>
-
-      </footer>
-    
-  </div>
-  
-</article>
-
-
-    
       <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
