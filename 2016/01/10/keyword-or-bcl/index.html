@@ -11,7 +11,7 @@
 <meta property="og:url" content="http://wk-j.gihub.io/2016/01/10/keyword-or-bcl/index.html">
 <meta property="og:site_name" content="wk's blog">
 <meta property="og:description" content="อย่างที่ทราบกันดีว่าใน C# จะมี type alias ที่ match กับ type ใน base class library (BCL) เป็น keyword ตัวพิมพ์เล็ก เช่น System.String มี alias คือ string ทั้ง String ใหญ่และ string เล็กในทางเทคนิกแล้ว">
-<meta property="og:updated_time" content="2016-01-11T10:44:30.000Z">
+<meta property="og:updated_time" content="2016-01-11T15:20:19.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="String หรือ string">
 <meta name="twitter:description" content="อย่างที่ทราบกันดีว่าใน C# จะมี type alias ที่ match กับ type ใน base class library (BCL) เป็น keyword ตัวพิมพ์เล็ก เช่น System.String มี alias คือ string ทั้ง String ใหญ่และ string เล็กในทางเทคนิกแล้ว">
@@ -84,7 +84,7 @@
 <figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">string</span> text;</span><br><span class="line"><span class="keyword">string</span>.IsNullOrEmpty(text);</span><br><span class="line"><span class="keyword">double</span> number;</span><br><span class="line"><span class="keyword">double</span>.TryParse(text, <span class="keyword">out</span> number);</span><br></pre></td></tr></table></figure>
 <p>แบบที่ 3 ใช้ alias ในประโยคประกาศตัวแปร และใช้ BCL เมื่อมีการเรียกใช้ method ใน class</p>
 <figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">string</span> text;</span><br><span class="line">String.IsNullOrEmpty(text);</span><br><span class="line"><span class="keyword">double</span> number;</span><br><span class="line">Double.TryParse(text, <span class="keyword">out</span> number);</span><br></pre></td></tr></table></figure>
-<p>สำหรับผม ผมใช้แบบที่ 2 คือ ใช้ alias ทั้งหมด เนื่องจาก ReSharper ที่ใช้สำหรับ refactor โค้ดปัจจุบันใช้ style เดียวกับทีม corefx มันจะ hint ให้เปลี่ยนเป็น alias เสมอ</p>
+<p>แล้วจะเลือกแบบไหนดี … อ่านเพิ่มจาก link ด้านล่างครับ</p>
 <p>Links</p>
 <ol>
 <li><a href="http://haacked.com/archive/2015/12/16/to-string-or-not/" target="_blank" rel="external">To String or to string.</a></li>
@@ -105,6 +105,19 @@
   </div>
   
     
+<nav id="article-nav">
+  
+    <a href="/2016/01/11/checked-and-unchecked/" id="article-nav-newer" class="article-nav-link-wrap">
+      <div class="article-nav-title"><span>&lt;</span>&nbsp;
+        
+          Checked กับ Unchecked
+        
+      </div>
+    </a>
+  
+  
+</nav>
+
   
 </article>
 
