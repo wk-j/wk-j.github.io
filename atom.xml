@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="http://wk-j.gihub.io/"/>
-  <updated>2016-01-13T19:11:18.000Z</updated>
+  <updated>2016-01-14T08:32:50.000Z</updated>
   <id>http://wk-j.gihub.io/</id>
   
   <author>
@@ -13,6 +13,21 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[Covariance กับ Contravariance]]></title>
+    <link href="http://wk-j.gihub.io/2016/01/14/covariance-and-contravariance/"/>
+    <id>http://wk-j.gihub.io/2016/01/14/covariance-and-contravariance/</id>
+    <published>2016-01-14T08:31:49.000Z</published>
+    <updated>2016-01-14T08:32:50.000Z</updated>
+    <content type="html"></content>
+    <summary type="html">
+    
+    </summary>
+    
+      <category term="cs" scheme="http://wk-j.gihub.io/tags/cs/"/>
+    
+  </entry>
   
   <entry>
     <title><![CDATA[Checked กับ Unchecked]]></title>
