@@ -84,16 +84,16 @@ ga('send', 'pageview');
     </div>
     <div class="article-entry" itemprop="articleBody">
       
-        <p>การใช้งาน Generic type ถ้าระบุ type argument ครบจำนวนที่ประกาศไว้ในเครื่องหมาย  <code>&lt;&gt;</code> เราจะเรียก type นั้นว่า closed type ถ้ามีการระบุไว้เพียงบางส่วน จะเรียกว่า structured type แต่ถ้าไม่ระบุ type argument เลยจะเรียกว่า open type ในบทความนี้จะขอพูดถึงเฉพาะ open และ closed type เท่านั้น</p>
+        <p>การใช้งาน Generic type ถ้าระบุ type argument ครบจำนวนที่ประกาศไว้ในเครื่องหมาย  <code>&lt;&gt;</code> เราจะเรียก type นั้นว่า closed type ถ้ามีการระบุไว้เพียงบางส่วน จะเรียกว่า structured type แต่ถ้าไม่ระบุ type argument เลยจะเรียกว่า open type</p>
 <h2 id="u0E04_u0E27_u0E32_u0E21_u0E41_u0E15_u0E01_u0E15_u0E48_u0E32_u0E07_u0E23_u0E30_u0E2B_u0E27_u0E48_u0E32_u0E07_open__u0E41_u0E25_u0E30_closed_type"><a href="#u0E04_u0E27_u0E32_u0E21_u0E41_u0E15_u0E01_u0E15_u0E48_u0E32_u0E07_u0E23_u0E30_u0E2B_u0E27_u0E48_u0E32_u0E07_open__u0E41_u0E25_u0E30_closed_type" class="headerlink" title="ความแตกต่างระหว่าง open และ closed type"></a>ความแตกต่างระหว่าง open และ closed type</h2><ul>
-<li>Open type ถือว่าเป็น type ที่ยังไม่สมบูรณ์ จึงไม่สามารถสร้าง instance ได้ ใช้ประโยชน์ได้อย่างเดียวคือใช้เป็น parameter ของ operator <code>typeof</code></li>
+<li>Open type ถือว่าเป็น type ที่ไม่สมบูรณ์ จึงไม่สามารถสร้าง instance ได้ แต่สามารถใช้เป็น input ของ operator <code>typeof</code></li>
 <li>Close type สามารถสร้าง instance ได้เหมือนคลาสทั่วไป</li>
 </ul>
 <h2 id="u0E15_u0E31_u0E27_u0E2D_u0E22_u0E48_u0E32_u0E07"><a href="#u0E15_u0E31_u0E27_u0E2D_u0E22_u0E48_u0E32_u0E07" class="headerlink" title="ตัวอย่าง"></a>ตัวอย่าง</h2><p>สร้าง GenericStruct เป็น generic type ง่าย ๆ โดยมีการระบุเงื่อนไขว่า type argument ต้องเป็น value type เท่านั้น</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">using System;</span><br><span class="line">using System.Runtime.InteropServices;</span><br><span class="line">using static System.Console;</span><br><span class="line"></span><br><span class="line">public class GenericStruct&lt;T&gt; where T: struct &#123;</span><br><span class="line">    public string Name &#123;</span><br><span class="line">        get &#123;</span><br><span class="line">            return typeof(T).Name;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="u0E17_u0E14_u0E2A_u0E2D_u0E1A"><a href="#u0E17_u0E14_u0E2A_u0E2D_u0E1A" class="headerlink" title="ทดสอบ"></a>ทดสอบ</h2><p>ทดสอบว่าสามารถสร้าง instance ของ open และ closed type ผ่าน <code>Activator.CreateInstance</code> ได้หรือไม่</p>
 <figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Program</span> &#123;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">object</span> <span class="title">CreateInstance</span>(<span class="params">Type t</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> Activator.CreateInstance(t);</span><br><span class="line">        &#125;<span class="keyword">catch</span>(Exception e) &#123;</span><br><span class="line">            WriteLine(e.Message);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> open1 = CreateInstance(<span class="keyword">typeof</span>(GenericStruct&lt;&gt;));</span><br><span class="line">        <span class="keyword">var</span> close1 = CreateInstance(<span class="keyword">typeof</span>(GenericStruct&lt;<span class="keyword">int</span>&gt;));</span><br><span class="line"></span><br><span class="line">        WriteLine(open1 == <span class="keyword">null</span>);                           <span class="comment">// true</span></span><br><span class="line">        WriteLine(close1 != <span class="keyword">null</span>);                          <span class="comment">// true</span></span><br><span class="line">        WriteLine((close1 <span class="keyword">as</span> GenericStruct&lt;<span class="keyword">int</span>&gt;).Name);     <span class="comment">// Int32</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>จากตัวอย่างจะเห็นว่าเราไม่สามารถ สร้าง  instance ของ <code>GenericStruct&lt;&gt;</code> ได้ เนื่องจากไม่ระบ type argument ไว้ในเครื่องหมาย <code>&lt;&gt;</code> ในบรรทัดที่ <code>14</code> จึงได้ <code>open1</code> มีค่า <code>null</code></p>
+<p>จากตัวอย่างจะเห็นว่าเราไม่สามารถ สร้าง  instance ของ <code>GenericStruct&lt;&gt;</code> ได้ เนื่องจากไม่ระบุ type argument ไว้ในเครื่องหมาย <code>&lt;&gt;</code> ในบรรทัดที่ <code>14</code> จึงได้ <code>open1</code> มีค่า <code>null</code></p>
 <p>ส่วน closed type <code>GenericStuct&lt;int&gt;</code> สามารถสร้าง instance และแสดงค่า <code>Name</code> ได้ปกติ</p>
 
       
@@ -120,7 +120,7 @@ ga('send', 'pageview');
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2016/01/14/covariance-and-contravariance/">Covariance กับ Contravariance</a>
+      <a class="article-title" href="/2016/01/14/covariance-and-contravariance/">Covariance กับ Contravariance (Draft)</a>
     </h1>
   
 
@@ -135,7 +135,52 @@ ga('send', 'pageview');
     </div>
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <p> ใน C# concept ที่เรียกว่า covariance และ contravariance ถูกใช้กับอะไรบ้าง</p>
+<ul>
+<li>ใช้กับ array ในเวอร์ชัน 1.0</li>
+<li>ใช้กับ delegate ในเวอร์ชั่น 2.0</li>
+<li>ใช้กับ generic ในเวอร์ชั่น 4.0</li>
+</ul>
+<h2 id="Substitution"><a href="#Substitution" class="headerlink" title="Substitution"></a>Substitution</h2><p>ก่อนจะรู้จักกับ covariance ต้องทำความเข้าใจกับหลักการ substitution ใน C# เสียก่อน</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Animal</span> &#123; .. &#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Cat</span>: <span class="title">Animal</span> &#123; .. &#125;</span><br></pre></td></tr></table></figure>
+<p>จาก class hierarchy จะเห็นว่า Animal เป็น supertype ของ Cat</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Animal a = <span class="keyword">new</span> Cat();    <span class="comment">// ok</span></span><br><span class="line">Cat b = <span class="keyword">new</span> Animal();    <span class="comment">// error</span></span><br></pre></td></tr></table></figure>
+<p>จากตัวอย่าง <code>Animal</code> เป็นเซ็ตที่ใหญ่กว่าตามหลัก <em>substitution principle</em> เราสามารถใช้ instance ของ <code>Cat</code> แทน instance ของ <code>Animal</code> ได้ แต่ไม่สามารถใช้ instance ของ <code>Animal</code> แทน <code>Cat</code> ให้นึกภาพว่า เราไม่สามารถนำกล่องที่ใหญ่มาใส่ในกล่องที่เล็กกว่านั่นเอง</p>
+<h2 id="Array"><a href="#Array" class="headerlink" title="Array"></a>Array</h2><p>Array ที่มี element เป็น reference type ใน C# ถือว่าเป็น covariance</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Animal[] animals = <span class="keyword">new</span> Cat[<span class="number">10</span>];</span><br></pre></td></tr></table></figure>
+<p>จากตัวอย่าง <code>Animal[]</code> compatible กับ <code>Cat[]</code> สามารถใช้ instance ของ <code>Cat</code> แทน <code>Animal</code> เราเรียกการ assign ค่าที่ type เล็กกว่าอยู่ด้านขวาของเครื่องหมาย <code>=</code> ว่า covariance</p>
+<p>แต่ covariance ของ array เป็น covariance แบบไม่ safe เนื่องจากเราสามารถใส่ instance ของคลาสอื่นนอกเหนือจาก <code>Cat</code> แต่อยู่ hierarch  ถัดจาก <code>Animal</code> ซึ่งจะทำให้เกิด <code>ArrayTypeMismatchException</code> ขณะรัน</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Attempted to access an element as a type incompatible with the array.</span></span><br><span class="line">animals[<span class="number">0</span>] = <span class="keyword">new</span> Dog()</span><br></pre></td></tr></table></figure>
+<p>จากตัวอย่างจะเกิด error ขณะรัน เนื่องจาก backing store ของ array ถูกกำหนดให้เก็บ <code>Cat</code> ตั้งแต่ต้น จึงไม่สามารถเก็บ element ที่มี type อื่นได้ ถึงแม้จะเป็น subtype ของ <code>Animal</code> เหมือนกันก็ตาม</p>
+<p>Covariance ใน array ถูก implement ตั้งแต่ C# 1.0 เพื่อให้เหมือนกับ Java ในขณะนั้น ถึงปัจจุบันปัญหา <code>TypeMissMatch</code> ก็ยังอยู่ ไม่สามารถตรวจสอบขณะ compile ได้</p>
+<p>ใน C# รุ่นต่อมา มีการ implement covariance กับส่วนอื่น ซึ่งจะไม่มีปัญหาลักษณะนี้ เนื่องจากมีการออกแบบให้มีความปลอดภัยตั้งแต่ต้น</p>
+<h2 id="Method_group"><a href="#Method_group" class="headerlink" title="Method group"></a>Method group</h2><h4 id="Covariance"><a href="#Covariance" class="headerlink" title="Covariance"></a>Covariance</h4><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Cat <span class="title">MakeCat</span>(<span class="params"></span>) </span>&#123; ... &#125;</span><br><span class="line">Func&lt;Animal&gt; makeAnimal = MakeCat</span><br></pre></td></tr></table></figure>
+<p>Covariant จะทำให้ <code>Func&lt;Animal&gt;</code> compatible กับ <code>MakeCat</code> เนื่องจาก <code>Animal</code> ใหญ่กว่า <code>Cat</code> จำสามารถทำ implicit conversion</p>
+<h4 id="Contravaraince"><a href="#Contravaraince" class="headerlink" title="Contravaraince"></a>Contravaraince</h4><p>ตัวอย่างนี้มีสอง method คือ <code>ShowCat</code> ที่รับ <code>Cat</code> เป็น parameter และ <code>Animal</code> ที่รับ <code>Animal</code> เป็น parameter</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">ShowCat</span>(<span class="params">Cat c</span>) </span>&#123;&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">ShowAnimal</span>(<span class="params">Animal c</span>) </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>จากตัวอย่างเราสามารถ assign method ไปยัง delegate <code>Action</code> ได้ดังนี้</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Action&lt;Cat&gt; action2 = ShowAnimal;   <span class="comment">// legal</span></span><br><span class="line">Action&lt;Animal&gt; action1 = ShowCat;   <span class="comment">// illegal</span></span><br></pre></td></tr></table></figure>
+<p>จากหลัก <em>substution principle</em> <code>Cat</code> นั้นเล็กว่า <code>Animal</code></p>
+<ul>
+<li>บรรทัดแรก <code>Action&lt;Cat&gt;</code> compatible กับ <code>ShowAnimal</code> เนื่องจาก เราสามารถใช้ <code>Cat</code> แทน <code>Animal</code> ได้ ในตัวอย่างนี้ถึงแม้จะใช้หลัก <code>substitution</code> เหมือนเดิม แต่ทิศทางการ assign ค่าด้วยเครื่องหมาย <code>=</code> จะกลับข้างกัน เราเรียก operation ลักษณะนี้ว่า <code>contravariance</code>  </li>
+<li>บรรทัดที่สอง <code>Action&lt;Animal&gt;</code> ไม่สามารถใช้แทน <code>ShowCat</code> ได้ เนื่องจากจะผิดหลัก <code>substitution</code> เพราะว่า <code>Animal</code> ใหญ่กว่า <code>Cat</code> จึงไม่สามารถใช้ <code>Animal</code> แทน <code>Cat</code> นั่นเอง</li>
+</ul>
+<h2 id="Generic_delegate"><a href="#Generic_delegate" class="headerlink" title="Generic delegate"></a>Generic delegate</h2><p>ใน C# 4.0 มีสิ่งที่เรียกว่า safe generic variant ที่ใช้ได้กับ interface และ delegate</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">delegate</span> TResult Func&lt;<span class="keyword">in</span> T, <span class="keyword">out</span> TResult&gt;(T arg);</span><br></pre></td></tr></table></figure>
+<p>จากตัวอย่าง เราสามารถประกาศ delegate ชื่อ <code>Func</code> ที่มี type parameter ตัวแรกเป็น contravariance <code>T</code> และมี type parameter ตัวที่สองเป็น covariance <code>TResult</code></p>
+<ul>
+<li>ใช้ keyword <code>in</code> เพื่อระบุว่า type parameter เป็น contravariance</li>
+<li>ใช้ keyword <code>out</code> เพื่อระบุว่า type parameter เป็น variance</li>
+</ul>
+<p>เรียกใช้งาน</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Func&lt;Animal, Cat&gt; f1 = (x) =&gt; <span class="keyword">new</span> Cat();</span><br><span class="line">Func&lt;Cat,Animal&gt; f2 = f1;</span><br></pre></td></tr></table></figure>
+<p><code>Func&lt;Animl,Cat&gt;</code> compatible กับ <code>Func&lt;Cat, Animal&gt;</code> เนื่องจากจาก type parameter ตัวแรกเป็น contravariance <code>Cat</code> ซึ่งเป็น type ที่เล็กกว่าจึงสามารถส่งเข้าไปในฟังก์ชั่นแทน <code>Animal</code> ส่วน type parameter ตัวที่สองเป็น covariance เราจึงใช้ <code>Animal</code> เพื่อรับค่าแทน <code>Cat</code> ที่ return มาจากฟังกํชั่นได้เช่นเดียวกัน</p>
+<p>Links</p>
+<ul>
+<li><a href="http://tomasp.net/blog/variance-explained.aspx" target="_blank" rel="external">The theory behind covariance and contravariance in C# 4</a></li>
+<li><a href="https://blogs.msdn.microsoft.com/ericlippert/2007/10/16/covariance-and-contravariance-in-c-part-one/" target="_blank" rel="external">Covariance and Contravariance in C#</a></li>
+</ul>
+
       
     </div>
     
