@@ -61,6 +61,57 @@ ga('send', 'pageview');
   </div>
 </header>
     <section id="main" class="outer">
+      <article id="post-const-and-readonly" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/01/18/const-and-readonly/">Const กับ Readonly (Draft)</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2016/01/18/const-and-readonly/" class="article-date">
+  <time datetime="2016-01-18T15:22:24.000Z" itemprop="datePublished">2016-01-18</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Constant"><a href="#Constant" class="headerlink" title="Constant"></a>Constant</h2><p>ค่าคงที่ (constant) ใน C# สามารถประกาศด้วย keyword <code>const</code> ซึ่งจะใช้ได้กับ data ประเภท primitive type ดังต่อไปนี้</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Boolean, Char, Byte, SByte, Int16, UInt16,</span><br><span class="line">Int32, UInt32, Int64, UInt64, Single, Double, Decimal, String</span><br></pre></td></tr></table></figure>
+<p>ค่า constant ไม่มีทางเปลี่ยนแปลงเป็นค่าอื่นได้ มันจึงถูก define เป็นส่วนหนึ่งของ type แบบ static member ไม่ใช่ instance member เหมือน field ทั่วไป</p>
+<p>เมื่อมีการอ้างอิงถึง constant ณ ส่วนใดของโค้ด compiler จะดึงค่าคงที่นั้นไปฝั่งไว้ใน IL ทำให้ขณะรันโปรแกรมไม่จำเป็นต้อง allocate memory</p>
+<h3 id="u0E02_u0E2D_u0E08_u0E33_u0E01_u0E31_u0E14_u0E02_u0E2D_u0E07_constant__u0E40_u0E1E_u0E37_u0E48_u0E2D_u0E40_u0E17_u0E35_u0E22_u0E1A_u0E01_u0E31_u0E1A_field"><a href="#u0E02_u0E2D_u0E08_u0E33_u0E01_u0E31_u0E14_u0E02_u0E2D_u0E07_constant__u0E40_u0E1E_u0E37_u0E48_u0E2D_u0E40_u0E17_u0E35_u0E22_u0E1A_u0E01_u0E31_u0E1A_field" class="headerlink" title="ขอจำกัดของ constant เพื่อเทียบกับ field"></a>ขอจำกัดของ constant เพื่อเทียบกับ field</h3><ul>
+<li>ไม่สามารถหาค่า address ของ constant ได้</li>
+<li>ไม่สามารถ pass constant แบบ reference ผ่าน keyword <code>ref</code></li>
+<li>ในกรณีที่มีการ reference assembly ที่มีค่า constants จำเป็น ต้อง compile โปรแกรมใหม่เพื่อให้ค่า constant ฝั่งกลับไปยังทุก assembly</li>
+</ul>
+<h3 id="u0E15_u0E31_u0E27_u0E2D_u0E22_u0E48_u0E32_u0E07"><a href="#u0E15_u0E31_u0E27_u0E2D_u0E22_u0E48_u0E32_u0E07" class="headerlink" title="ตัวอย่าง"></a>ตัวอย่าง</h3><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Program</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">const</span> <span class="keyword">string</span> ProductName = <span class="string">"Visual C#"</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">string</span> _version = <span class="string">"1.0"</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params">String[] args</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> name = ProductName;</span><br><span class="line">        <span class="keyword">var</span> version = _version;</span><br><span class="line">        Console.WriteLine(<span class="string">"&#123;0&#125; &#123;1&#125;"</span>, name, version);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>จากตัวอย่าง มีการประกาศตัวแปรแบบ static ชื่อ <code>_version</code> และมีค่า constant ชื่อ <code>ProductName</code></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">.method public hidebysig static</span><br><span class="line">	void Main (</span><br><span class="line">		string[] args</span><br><span class="line">	) cil managed</span><br><span class="line">&#123;</span><br><span class="line">	// Header Size: 12 bytes</span><br><span class="line">	// Code Size: 27 (0x1B) bytes</span><br><span class="line">	// LocalVarSig Token: 0x11000001 RID: 1</span><br><span class="line">	.maxstack 3</span><br><span class="line">	.entrypoint</span><br><span class="line">	.locals init (</span><br><span class="line">		[0] string,</span><br><span class="line">		[1] string</span><br><span class="line">	)</span><br><span class="line"></span><br><span class="line">	/* 0x0000025C 00           */ IL_0000: nop</span><br><span class="line">	/* 0x0000025D 7201000070   */ IL_0001: ldstr     "Visual C#"</span><br><span class="line">	/* 0x00000262 0A           */ IL_0006: stloc.0</span><br><span class="line">	/* 0x00000263 7E02000004   */ IL_0007: ldsfld    string Program::_version</span><br><span class="line">	/* 0x00000268 0B           */ IL_000C: stloc.1</span><br><span class="line">	/* 0x00000269 7215000070   */ IL_000D: ldstr     "&#123;0&#125; &#123;1&#125;"</span><br><span class="line">	/* 0x0000026E 06           */ IL_0012: ldloc.0</span><br><span class="line">	/* 0x0000026F 07           */ IL_0013: ldloc.1</span><br><span class="line">	/* 0x00000270 280400000A   */ IL_0014: call      void [mscorlib]System.Console::WriteLine(string, object, object)</span><br><span class="line">	/* 0x00000275 00           */ IL_0019: nop</span><br><span class="line">	/* 0x00000276 2A           */ IL_001A: ret</span><br><span class="line">&#125; // end of method Program::Main</span><br></pre></td></tr></table></figure>
+<p>เมื่อ compile เป็นคำสั่ง IL จะพบความแตกต่างระหว่างตัวแบบ static ธรรมดากับค่า static constant ดังนี้</p>
+<ul>
+<li>บรรทัดที่ 17 จะเห็นว่าตำแหน่งที่อ้างถึง ค่า constant มีการฝั่งค่า string literal <code>Visual C#</code> ไว้เลย</li>
+<li>บรรทัดที่ 19 ตำแหน่งตัวแปรแบบ static ยังมีการอ้างอิงไปยัง ชื่อตัวแปรโดยใช้คำสั่ง <code>ldsfld string Program::_version</code> อยู่</li>
+</ul>
+
+      
+    </div>
+    
+    
+  </div>
+  
+</article>
+
+
+    
       <article id="post-open-and-close-types" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
