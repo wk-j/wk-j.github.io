@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="http://wk-j.gihub.io/"/>
-  <updated>2016-01-23T04:58:37.000Z</updated>
+  <updated>2016-01-23T06:29:00.000Z</updated>
   <id>http://wk-j.gihub.io/</id>
   
   <author>
@@ -19,9 +19,9 @@
     <link href="http://wk-j.gihub.io/2016/01/22/fsharp-inline-evaluation-with-light-table/"/>
     <id>http://wk-j.gihub.io/2016/01/22/fsharp-inline-evaluation-with-light-table/</id>
     <published>2016-01-22T12:38:28.000Z</published>
-    <updated>2016-01-23T04:58:37.000Z</updated>
+    <updated>2016-01-23T06:29:00.000Z</updated>
     <content type="html"><![CDATA[<p>โปรแกรม <a href="http://lighttable.com" target="_blank" rel="external">Light Table</a> เป็น Text editor ที่สามารถเขียนโปรแกรมแบบ Inline evaluation คือ เราสามารถพิมพ์โค้ดและสั่ง Execute คำสั่งในบรรทัดนั้น เพื่อดูผลลัพธ์ได้ทันที</p>
-<p>ข้อดีของการเขียนโปรแกรมแบบนี้ คือ เราสามารถใช้ทดสอบโค้ดได้ง่าย ไม่ต้องใช้ IDE หรือเขียนโปรแกรมพิมพ์ผลลัพท์ผ่าน Console  ที่ความยุ่งยาก</p>
+<p>ข้อดีของการเขียนโปรแกรมแบบนี้ คือ เราสามารถใช้ทดสอบโค้ดได้ง่าย ไม่ต้องใช้ IDE หรือเขียนโปรแกรมพิมพ์ผลลัพธ์ผ่าน Console  ที่มีความยุ่งยาก</p>
 <h2 id="u0E40_u0E04_u0E23_u0E37_u0E48_u0E2D_u0E07_u0E21_u0E37_u0E2D_u0E17_u0E35_u0E48_u0E15_u0E49_u0E2D_u0E07_u0E43_u0E0A_u0E49"><a href="#u0E40_u0E04_u0E23_u0E37_u0E48_u0E2D_u0E07_u0E21_u0E37_u0E2D_u0E17_u0E35_u0E48_u0E15_u0E49_u0E2D_u0E07_u0E43_u0E0A_u0E49" class="headerlink" title="เครื่องมือที่ต้องใช้"></a>เครื่องมือที่ต้องใช้</h2><ol>
 <li>โปรแกรม F# interactive fsharpi (Mac) / fsi (Windows)</li>
 <li>โปรแกรม Light Table</li>
@@ -206,8 +206,8 @@
     <link href="http://wk-j.gihub.io/2016/01/11/checked-and-unchecked/"/>
     <id>http://wk-j.gihub.io/2016/01/11/checked-and-unchecked/</id>
     <published>2016-01-11T11:11:57.000Z</published>
-    <updated>2016-01-13T19:11:18.000Z</updated>
-    <content type="html"><![CDATA[<h2 id="Max__26amp_3B_Min"><a href="#Max__26amp_3B_Min" class="headerlink" title="Max &amp; Min"></a>Max &amp; Min</h2><p>Primitive type ใน C# เช่น short float หรือ int จะมี min และ max value เป็นค่าต่ำสุดและสูงสุดที่เป็นไปได้ ค่านี้ถูกกำหนดโดยจำนวนบิตของ type เช่น int มี 32 bit เลขฐานสองขนาด 32 bit สามารถแสดงตัวเลขได้ถึง 4294967296 แต่เนื่องจาก int เป็น sign integer ต้องใช้ 1 bit สำหรับเก็บ flag + หรือ - ดังนั้น bit ที่ใช้สำหรับเก็บตัวเลขจึงเหลือ 31 bit ทำให้สามารถเก็บค่าต่ำสุดและสูงสุดดังนี้</p>
+    <updated>2016-01-23T06:30:54.000Z</updated>
+    <content type="html"><![CDATA[<h2 id="Max__26amp_3B_Min"><a href="#Max__26amp_3B_Min" class="headerlink" title="Max &amp; Min"></a>Max &amp; Min</h2><p>Primitive type ใน C# เช่น short float หรือ int จะมี min และ max value เป็นค่าต่ำสุดและสูงสุดที่เป็นไปได้ ค่านี้ถูกกำหนดโดยจำนวน bit ของ type เช่น int มี 32 bit เลขฐานสองขนาด 32 bit สามารถแสดงตัวเลขได้ถึง 4294967296 แต่เนื่องจาก int เป็น sign integer ต้องใช้ 1 bit สำหรับเก็บ flag + หรือ - ดังนั้น bit ที่ใช้สำหรับเก็บตัวเลขจึงเหลือ 31 bit ทำให้สามารถเก็บค่าต่ำสุดและสูงสุดดังนี้</p>
 <figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">const</span> Int32 MaxValue = <span class="number">2147483647</span>;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">const</span> Int32 MinValue = -<span class="number">2147483648</span>;</span><br></pre></td></tr></table></figure>
 <p>จากปัจจัยนี้ทำให้ int ไม่สามารถใช้เก็บค่าที่ต่ำหรือสูงกว่า min และ max นี้ได้ ถ้าพยายาม assign ค่านอกจาก range นี้ก็จะเกิดสิ่งที่เรียกกว่า overflow</p>
 <p>ภาษาต่าง ๆ จะมีวิธีจัดการกับ overflow ที่ต่างกัน เช่น C, C++ จะไม่สนใจ overflow และไม่ถือว่า overflow คือ error ดังนั้นโปรแกรมเมอร์ ต้องควบคุมจัดการเอง</p>
