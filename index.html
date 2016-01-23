@@ -61,6 +61,90 @@ ga('send', 'pageview');
   </div>
 </header>
     <section id="main" class="outer">
+      <article id="post-fsharp-inline-evaluation-with-light-table" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/01/22/fsharp-inline-evaluation-with-light-table/">เขียน F# แบบ Inline evaluation ด้วย Light Table</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2016/01/22/fsharp-inline-evaluation-with-light-table/" class="article-date">
+  <time datetime="2016-01-22T12:38:28.000Z" itemprop="datePublished">2016-01-22</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>โปรแกรม <a href="http://lighttable.com" target="_blank" rel="external">Light Table</a> เป็น Text editor ที่สามารถเขียนโปรแกรมแบบ Inline evaluation คือ เราสามารถพิมพ์โค้ดและสั่ง Execute คำสั่งในบรรทัดนั้น เพื่อดูผลลัพธ์ได้ทันที</p>
+<p>ข้อดีของการเขียนโปรแกรมแบบนี้ คือ เราสามารถใช้ทดสอบโค้ดได้ง่าย ไม่ต้องใช้ IDE หรือเขียนโปรแกรมพิมพ์ผลลัพท์ผ่าน Console  ที่ความยุ่งยาก</p>
+<h2 id="u0E40_u0E04_u0E23_u0E37_u0E48_u0E2D_u0E07_u0E21_u0E37_u0E2D_u0E17_u0E35_u0E48_u0E15_u0E49_u0E2D_u0E07_u0E43_u0E0A_u0E49"><a href="#u0E40_u0E04_u0E23_u0E37_u0E48_u0E2D_u0E07_u0E21_u0E37_u0E2D_u0E17_u0E35_u0E48_u0E15_u0E49_u0E2D_u0E07_u0E43_u0E0A_u0E49" class="headerlink" title="เครื่องมือที่ต้องใช้"></a>เครื่องมือที่ต้องใช้</h2><ol>
+<li>โปรแกรม F# interactive fsharpi (Mac) / fsi (Windows)</li>
+<li>โปรแกรม Light Table</li>
+<li>F# Plugin ของ Light Table</li>
+</ol>
+<h2 id="u0E15_u0E34_u0E14_u0E15_u0E31_u0E49_u0E07_fsharpi_/_fsi"><a href="#u0E15_u0E34_u0E14_u0E15_u0E31_u0E49_u0E07_fsharpi_/_fsi" class="headerlink" title="ติดตั้ง fsharpi / fsi"></a>ติดตั้ง fsharpi / fsi</h2><ul>
+<li>Mac - <a href="http://fsharp.org/use/mac" target="_blank" rel="external">http://fsharp.org/use/mac</a></li>
+<li>Windows - <a href="http://fsharp.org/use/windows" target="_blank" rel="external">http://fsharp.org/use/windows</a></li>
+</ul>
+<h2 id="u0E15_u0E34_u0E14_u0E15_u0E31_u0E49_u0E07_Light_Table"><a href="#u0E15_u0E34_u0E14_u0E15_u0E31_u0E49_u0E07_Light_Table" class="headerlink" title="ติดตั้ง Light Table"></a>ติดตั้ง Light Table</h2><ul>
+<li>สามารถโหลดไฟล์ <a href="http://lighttable.com/" target="_blank" rel="external">Installer</a> จากเว็บไซต์ได้โดยตรง</li>
+</ul>
+<h2 id="u0E15_u0E34_u0E14_u0E15_u0E31_u0E49_u0E07_F_23_Plugin"><a href="#u0E15_u0E34_u0E14_u0E15_u0E31_u0E49_u0E07_F_23_Plugin" class="headerlink" title="ติดตั้ง F# Plugin"></a>ติดตั้ง F# Plugin</h2><p>หลังจากติดตั้ง Light Table สามารถติดตั้ง Plugin ผ่าน Plugin manager ตามขั้นตอนต่อไปนี้</p>
+<ol>
+<li>เปิดโปรแกรม Light Table</li>
+<li><p>เปิดหน้าต่าง Plugin manager โดยการกดปุ่ม <code>Ctlr + Space</code> พิมพ์คำว่า <code>plugin</code> แล้วคลิกเลือก <code>Show plugin manager</code></p>
+<p> <img src="/images/open-plugin-manager.png" alt=""></p>
+</li>
+<li><p>ในหน้า Plugin manager ให้ Search คำว่า <code>F#</code> แล้วคลิกปุ่ม Install ที่มุมด้านขวา</p>
+<p> <img src="/images/install-plugin.png" alt=""></p>
+</li>
+</ol>
+<h3 id="u0E01_u0E32_u0E23_u0E43_u0E0A_u0E49_u0E07_u0E32_u0E19"><a href="#u0E01_u0E32_u0E23_u0E43_u0E0A_u0E49_u0E07_u0E32_u0E19" class="headerlink" title="การใช้งาน"></a>การใช้งาน</h3><p>หนังจากติดตั้ง Plugin เราสามารถใช้งานได้ทันที่ ด้วยวิธีง่าย ๆ ดังนี้</p>
+<ol>
+<li>พิมพ์โคัด</li>
+<li>Hightlight บรรทัดที่ต้องการ</li>
+<li><p>กด <code>Alt + Enter</code></p>
+<p> <img src="/images/inline-evaluation.png" alt=""></p>
+</li>
+</ol>
+<p>จากตัวอย่าง</p>
+<ul>
+<li>ถ้าบรรทัดที่เลือก return void โปรแกรมจะแสดงเครื่องหมายถูก</li>
+<li>ส่วนบรรทัดที่ return ค่า โปรแกรมจะแสดงผลลัทธ์ที่ท้ายบรรทัด</li>
+</ul>
+<p>Links</p>
+<ul>
+<li>Light Table - <a href="http://lighttable.com" target="_blank" rel="external">http://lighttable.com</a></li>
+<li>F# Plugin - <a href="https://github.com/enricosada/LightTable-FSharp" target="_blank" rel="external">https://github.com/enricosada/LightTable-FSharp</a></li>
+<li>Use F# on Windows - <a href="http://fsharp.org/use/windows" target="_blank" rel="external">http://fsharp.org/use/windows</a></li>
+<li>Use F# on Mac - <a href="http://fsharp.org/use/mac" target="_blank" rel="external">http://fsharp.org/use/mac</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/fs/">fs</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+</article>
+
+
+    
       <article id="post-const-and-readonly" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     

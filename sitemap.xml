@@ -2,6 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://wk-j.gihub.io/2016/01/22/fsharp-inline-evaluation-with-light-table/</loc>
+    <lastmod>2016-01-23T04:52:10.000Z</lastmod>
+  </url>
+  
+  <url>
     <loc>http://wk-j.gihub.io/2016/01/18/const-and-readonly/</loc>
     <lastmod>2016-01-20T18:46:44.000Z</lastmod>
   </url>
