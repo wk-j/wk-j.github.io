@@ -61,6 +61,69 @@ ga('send', 'pageview');
   </div>
 </header>
     <section id="main" class="outer">
+      <article id="post-fsharp-fizz-buzz" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/01/24/fsharp-fizz-buzz/">Fizz Buzz in F#</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2016/01/24/fsharp-fizz-buzz/" class="article-date">
+  <time datetime="2016-01-24T09:46:08.000Z" itemprop="datePublished">2016-01-24</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Fuzz_Buzz"><a href="#Fuzz_Buzz" class="headerlink" title="Fuzz Buzz"></a>Fuzz Buzz</h2><p>Fizz Buzz เป็นโจทย์ที่นิยมใช้สำหรับ ทดสอบการเขียนโปรแกรม กฎคือ ให้เขียนโปรแกรมที่รันเลขตั้งแต่ 1 - 100 โดย</p>
+<ol>
+<li>ถ้าเลขนั้นหาร 3 ลงตัวให้พิมพ์ <code>Fizz</code></li>
+<li>ถ้าเลขนั้นหาร 5 ลงตัวให้พิมพ์ <code>Buzz</code></li>
+<li>และถ้าเลขนั้นหารทั้ง 3 และ 5 ลงตัวให้พิมพ์ <code>FizzBuzz</code></li>
+</ol>
+<p>ใน F# สามารถแก้ปัญหานี้ได้หลายวิธี วิธีที่ง่ายสุดคือใช้ Pattern matching อีกวิธีคือใช้ Active pattern ซึ่งจะทำให้โค้ดอ่านง่ายขึ้น ส่วนวิธีสุดท้ายที่ยากสุดคือ ใช้ Computation expression</p>
+<h2 id="Pattern_matching"><a href="#Pattern_matching" class="headerlink" title="Pattern matching"></a>Pattern matching</h2><p>Pattern matching แบบแรกคือ ใช้วิธีีคำนวณตัวเลขทีตำแหน่ง matching case โดยใช้ when guard</p>
+<figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> fizzBuzz number =</span><br><span class="line">    <span class="keyword">match</span> number <span class="keyword">with</span></span><br><span class="line">    | n <span class="keyword">when</span> n % <span class="number">15</span> = <span class="number">0</span> -&gt; <span class="string">"FizzBuzz"</span></span><br><span class="line">    | n <span class="keyword">when</span> n % <span class="number">3</span> = <span class="number">0</span> -&gt; <span class="string">"Fizz"</span></span><br><span class="line">    | n <span class="keyword">when</span> n % <span class="number">5</span> = <span class="number">0</span> -&gt; <span class="string">"Buzz"</span></span><br><span class="line">    | n -&gt; sprintf <span class="string">"%d"</span> n</span><br><span class="line"></span><br><span class="line">[<span class="number">1.</span><span class="number">.100</span>]</span><br><span class="line">|&gt; List.map fizzBuzz</span><br><span class="line">|&gt; List.iter (printfn <span class="string">"%s"</span>)</span><br></pre></td></tr></table></figure>
+<p>หรือคำนวนในประโยค <code>match ... with</code></p>
+<figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> fizzBuzz i =</span><br><span class="line">    <span class="keyword">match</span> i % <span class="number">3</span>, i % <span class="number">5</span> <span class="keyword">with</span></span><br><span class="line">    | <span class="number">0</span>, <span class="number">0</span> -&gt; <span class="string">"FizzBuzz"</span></span><br><span class="line">    | <span class="number">0</span>, _ -&gt; <span class="string">"Fizz"</span></span><br><span class="line">    | _, <span class="number">0</span> -&gt; <span class="string">"Buzz"</span></span><br><span class="line">    | _ -&gt; string i</span><br><span class="line">[<span class="number">1.</span><span class="number">.100</span>] |&gt; Seq.map fizzBuzz0 |&gt; Seq.iter (printfn <span class="string">"%s"</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="Partial_active_pattern"><a href="#Partial_active_pattern" class="headerlink" title="Partial active pattern."></a>Partial active pattern.</h2><p>ใช้ Partial active pattern สองตัว คือ <code>P3</code> และ <code>P5</code></p>
+<figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> (|P3|_|) i = <span class="keyword">if</span> i % <span class="number">3</span> = <span class="number">0</span> <span class="keyword">then</span> Some i <span class="keyword">else</span> None</span><br><span class="line"><span class="keyword">let</span> (|P5|_|) i = <span class="keyword">if</span> i % <span class="number">5</span> = <span class="number">0</span> <span class="keyword">then</span> Some i <span class="keyword">else</span> None</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> f = <span class="keyword">function</span></span><br><span class="line">  | P3 _ &amp; P5 _ -&gt; printfn <span class="string">"FizzBuzz"</span></span><br><span class="line">  | P3 _        -&gt; printfn <span class="string">"Fizz"</span></span><br><span class="line">  | P5 _        -&gt; printfn <span class="string">"Buzz"</span></span><br><span class="line">  | x           -&gt; printfn <span class="string">"%d"</span> x</span><br><span class="line"></span><br><span class="line">Seq.iter f &#123;<span class="number">1.</span><span class="number">.100</span>&#125;</span><br><span class="line"><span class="comment">//or</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="number">1.</span><span class="number">.100</span> <span class="keyword">do</span> f i</span><br></pre></td></tr></table></figure>
+<p>หรือใช้ Partial case เดียว คือ <code>DivisibleBy</code> ซึ่งเป็น Optimize version ของแบบแรก</p>
+<figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> (|DivisibleBy|_|) divisor i =</span><br><span class="line">    <span class="keyword">if</span> i % divisor = <span class="number">0</span> <span class="keyword">then</span> Some () <span class="keyword">else</span> None</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="number">1.</span><span class="number">.100</span> <span class="keyword">do</span></span><br><span class="line">    <span class="keyword">match</span> i <span class="keyword">with</span></span><br><span class="line">    | DivisibleBy <span class="number">3</span> &amp; DivisibleBy <span class="number">5</span> -&gt; printfn <span class="string">"FizzBuzz"</span></span><br><span class="line">    | DivisibleBy <span class="number">3</span> -&gt; printfn <span class="string">"Fizz"</span></span><br><span class="line">    | DivisibleBy <span class="number">5</span> -&gt; printfn <span class="string">"Buzz"</span></span><br><span class="line">    | _ -&gt; printfn <span class="string">"%d"</span> i</span><br></pre></td></tr></table></figure>
+<h2 id="Computation_expression"><a href="#Computation_expression" class="headerlink" title="Computation expression"></a>Computation expression</h2><p>วิธีที่ยากสุด คือ เขียนด้วย Computation expression</p>
+<figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">type</span> <span class="title">M</span>&lt;<span class="title">'T</span>&gt;  </span>= M <span class="keyword">of</span> <span class="attribute">'T</span></span><br><span class="line"><span class="class"><span class="keyword">type</span> <span class="title">MonadBuilder</span></span>() =</span><br><span class="line">    <span class="keyword">member</span> this.Return x = M x</span><br><span class="line"><span class="keyword">let</span> m = <span class="keyword">new</span> MonadBuilder()</span><br><span class="line"><span class="keyword">let</span> fizz = <span class="keyword">function</span></span><br><span class="line">    | x <span class="keyword">when</span> x % <span class="number">3</span> = <span class="number">0</span>  -&gt; m &#123; <span class="keyword">return</span> x, <span class="string">"Fizz"</span>&#125;</span><br><span class="line">    | x -&gt; m &#123; <span class="keyword">return</span> x, <span class="string">""</span> &#125;</span><br><span class="line"><span class="keyword">let</span> buzz = <span class="keyword">function</span></span><br><span class="line">    | M (x,s) <span class="keyword">when</span> x % <span class="number">5</span> = <span class="number">0</span> -&gt; m &#123; <span class="keyword">return</span> x, s + <span class="string">"Buzz"</span> &#125;</span><br><span class="line">    | M (x,s) -&gt; m &#123; <span class="keyword">return</span> x, s &#125;</span><br><span class="line">[<span class="number">1.</span><span class="number">.100</span>] |&gt; List.map(fizz) |&gt; List.map(buzz) |&gt; printfn <span class="string">"%A"</span></span><br></pre></td></tr></table></figure>
+<p>Links</p>
+<ul>
+<li><a href="http://stackoverflow.com/questions/2422697/how-to-code-fizzbuzz-in-f" target="_blank" rel="external">http://stackoverflow.com/questions/2422697/how-to-code-fizzbuzz-in-f</a></li>
+<li><a href="http://zecl.hatenablog.com/entry/20110711/p1" target="_blank" rel="external">http://zecl.hatenablog.com/entry/20110711/p1</a></li>
+<li><a href="https://twitter.com/CallMeKohei/status/673677619250913280" target="_blank" rel="external">https://twitter.com/CallMeKohei/status/673677619250913280</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/fs/">fs</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+</article>
+
+
+    
       <article id="post-fsharp-active-pattern" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -69,7 +132,7 @@ ga('send', 'pageview');
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2016/01/23/fsharp-active-pattern/">F# Active Patterns (Draft)</a>
+      <a class="article-title" href="/2016/01/23/fsharp-active-pattern/">F# Active Patterns</a>
     </h1>
   
 
@@ -84,11 +147,20 @@ ga('send', 'pageview');
     </div>
     <div class="article-entry" itemprop="articleBody">
       
-        <p>F# มี syntax พิเศษที่ช่วยให้เขียน Pattern matching ได้ง่ายขึ้น โดยเราสามารถเขียนโครงสร้างข้อมูลคล้าย ๆ กับ union โดยเขียน test case ที่ต้องการในเครื่องหมาย <code>(||)</code></p>
-<h2 id="Single-Case_Active_Patterns"><a href="#Single-Case_Active_Patterns" class="headerlink" title="Single-Case Active Patterns"></a>Single-Case Active Patterns</h2><figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> (|Remainder2|) x = x % <span class="number">2</span></span><br><span class="line"><span class="keyword">let</span> checkNumber = <span class="keyword">function</span></span><br><span class="line">    | Remainder2 <span class="number">1</span> -&gt; <span class="string">"even number"</span></span><br><span class="line">    | Remainder2 <span class="number">0</span> -&gt; <span class="string">"odd number"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// "even number"</span></span><br><span class="line">checkNumber <span class="number">1</span></span><br></pre></td></tr></table></figure>
-<h2 id="Partial-Case_Active_Pattern"><a href="#Partial-Case_Active_Pattern" class="headerlink" title="Partial-Case Active Pattern"></a>Partial-Case Active Pattern</h2><figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> (|LessThen10|_|) x = <span class="keyword">if</span> x &lt; <span class="number">10</span> <span class="keyword">then</span> Some x <span class="keyword">else</span> None</span><br><span class="line"><span class="keyword">let</span> (|Btw10And20|_|) x = <span class="keyword">if</span> x &gt;= <span class="number">10</span> &amp;&amp; x &lt; <span class="number">20</span> <span class="keyword">then</span> Some x <span class="keyword">else</span> None</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> checkNumber x =</span><br><span class="line">    <span class="keyword">match</span> x <span class="keyword">with</span></span><br><span class="line">    | LessThen10 a -&gt; <span class="string">"less then 10"</span></span><br><span class="line">    | Btw10And20 a -&gt; <span class="string">"between 10 and 20"</span></span><br><span class="line">    | _ -&gt; <span class="string">"that's a big number"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// "that's big number"</span></span><br><span class="line">checkNumber <span class="number">20</span></span><br></pre></td></tr></table></figure>
-<h2 id="Multicase_Active_Pattern"><a href="#Multicase_Active_Pattern" class="headerlink" title="Multicase Active Pattern"></a>Multicase Active Pattern</h2><figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> (|Q1|Q2|Q3|Q4|) (date:System.DateTime) =</span><br><span class="line">    <span class="keyword">let</span> month = date.Month</span><br><span class="line">    <span class="keyword">match</span> month <span class="keyword">with</span></span><br><span class="line">    |<span class="number">1</span>|<span class="number">2</span>|<span class="number">3</span> -&gt; Q1 month</span><br><span class="line">    |<span class="number">4</span>|<span class="number">5</span>|<span class="number">6</span> -&gt; Q2 month</span><br><span class="line">    |<span class="number">7</span>|<span class="number">8</span>|<span class="number">9</span> -&gt; Q3 month</span><br><span class="line">    |_ -&gt; Q4 month</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> newYearResolution date =</span><br><span class="line">    <span class="keyword">match</span> date <span class="keyword">with</span></span><br><span class="line">    | Q1 _ -&gt; <span class="string">"read"</span></span><br><span class="line">    | Q2 _ -&gt; <span class="string">"write"</span></span><br><span class="line">    | Q3 _ -&gt; <span class="string">"execute"</span></span><br><span class="line">    | Q4 _ -&gt; <span class="string">"sleep"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// "sleep"</span></span><br><span class="line">newYearResolution &lt;| DateTime(<span class="number">2015</span>,<span class="number">10</span>,<span class="number">10</span>)</span><br></pre></td></tr></table></figure>
-<h2 id="Parameterized_Active_Pattern"><a href="#Parameterized_Active_Pattern" class="headerlink" title="Parameterized Active Pattern"></a>Parameterized Active Pattern</h2><figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span>(|Divisible|_|) x y =</span><br><span class="line">    <span class="keyword">if</span> y % x = <span class="number">0</span> <span class="keyword">then</span> Some Divisible</span><br><span class="line">    <span class="keyword">else</span> None</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> f2 = <span class="keyword">function</span></span><br><span class="line">    | Divisible <span class="number">2</span> &amp; Divisible <span class="number">3</span> -&gt; <span class="string">"divisible by 6"</span></span><br><span class="line">    | _-&gt; <span class="string">"other"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// "divisible by 6"</span></span><br><span class="line">f2 <span class="number">12</span></span><br></pre></td></tr></table></figure>
+        <p>F# มี syntax พิเศษที่ช่วยให้เขียน Pattern matching ได้ง่ายขึ้น โดยใช้โครงสร้างคล้าย ๆ กับ <a href="https://msdn.microsoft.com/en-us/library/dd233226.aspx" target="_blank" rel="external">Union</a> ใช้วิธีประกาศ Test case ที่ต้องการในเครื่องหมาย <code>(||)</code> Active pattern มีหลายแบบ ขึ้นอยู่กับจำนวน Case ที่ใช้</p>
+<h2 id="Single-Case_Active_Patterns"><a href="#Single-Case_Active_Patterns" class="headerlink" title="Single-Case Active Patterns"></a>Single-Case Active Patterns</h2><p>เป็น Active pattern ที่มี Case เดียวและมี Input เพียงตัวเดียว Active pattern แบบนี้ต้อง Return ผลลัพทธ์เสมอ</p>
+<figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> (|Remainder2|) x = x % <span class="number">2</span></span><br><span class="line"><span class="keyword">let</span> checkNumber = <span class="keyword">function</span></span><br><span class="line">    | Remainder2 <span class="number">1</span> -&gt; <span class="string">"even number"</span></span><br><span class="line">    | Remainder2 <span class="number">0</span> -&gt; <span class="string">"odd number"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// "even number"</span></span><br><span class="line">checkNumber <span class="number">1</span></span><br></pre></td></tr></table></figure>
+<p>จากตัวอย่าง <code>Remainder2</code> เป็น Pattern ที่มี Case โดยคำนวณค่า Mod จาก Input ที่ส่งเข้ามา</p>
+<h2 id="Partial-Case_Active_Pattern"><a href="#Partial-Case_Active_Pattern" class="headerlink" title="Partial-Case Active Pattern"></a>Partial-Case Active Pattern</h2><p>เป็น Active patten ที่ Return ผลลัพท์เป็น Option และสามารถใช้ Pattern หลายตัวมาประกอบกัน เมื่อต้องการ Matching</p>
+<figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> (|LessThen10|_|) x = <span class="keyword">if</span> x &lt; <span class="number">10</span> <span class="keyword">then</span> Some x <span class="keyword">else</span> None</span><br><span class="line"><span class="keyword">let</span> (|Btw10And20|_|) x = <span class="keyword">if</span> x &gt;= <span class="number">10</span> &amp;&amp; x &lt; <span class="number">20</span> <span class="keyword">then</span> Some x <span class="keyword">else</span> None</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> checkNumber x =</span><br><span class="line">    <span class="keyword">match</span> x <span class="keyword">with</span></span><br><span class="line">    | LessThen10 a -&gt; <span class="string">"less then 10"</span></span><br><span class="line">    | Btw10And20 a -&gt; <span class="string">"between 10 and 20"</span></span><br><span class="line">    | _ -&gt; <span class="string">"that's a big number"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// "that's big number"</span></span><br><span class="line">checkNumber <span class="number">20</span></span><br></pre></td></tr></table></figure>
+<p><code>LessThen10</code> และ <code>Btw10And20</code> เป็น Partial pattern ที่ทดสอบว่าตัวเลขอยู่ใน Range ของตัวเองหรือไม่ สังเกตว่า Output ที่ได้จะเป็น Option ซึ่งในกรณีที่ Return ค่าเป็น None แสดงว่า Input ที่รับเข้ามาอยู่นอก Range นั่นเอง ในกรณีที่ Input ที่รับมาไม่อยู่ใน Range ใดเลย เมื่อทำการ Matching ก็จะถูก Evaluate เข้า Case default หรือ <code>_</code> นั่นเอง</p>
+<h2 id="Multicase_Active_Pattern"><a href="#Multicase_Active_Pattern" class="headerlink" title="Multicase Active Pattern"></a>Multicase Active Pattern</h2><p>เป็น Pattern matching ที่มีหลาย Case โดย Pattern แบบนี้ต้อง Return choice ตามจำนวนตาม Case ที่ประกาศไว้ใน <code>(||)</code></p>
+<figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> (|Q1|Q2|Q3|Q4|) (date:System.DateTime) =</span><br><span class="line">    <span class="keyword">let</span> month = date.Month</span><br><span class="line">    <span class="keyword">match</span> month <span class="keyword">with</span></span><br><span class="line">    |<span class="number">1</span>|<span class="number">2</span>|<span class="number">3</span> -&gt; Q1 month</span><br><span class="line">    |<span class="number">4</span>|<span class="number">5</span>|<span class="number">6</span> -&gt; Q2 month</span><br><span class="line">    |<span class="number">7</span>|<span class="number">8</span>|<span class="number">9</span> -&gt; Q3 month</span><br><span class="line">    |_ -&gt; Q4 month</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> newYearResolution date =</span><br><span class="line">    <span class="keyword">match</span> date <span class="keyword">with</span></span><br><span class="line">    | Q1 _ -&gt; <span class="string">"read"</span></span><br><span class="line">    | Q2 _ -&gt; <span class="string">"write"</span></span><br><span class="line">    | Q3 _ -&gt; <span class="string">"execute"</span></span><br><span class="line">    | Q4 _ -&gt; <span class="string">"sleep"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// "sleep"</span></span><br><span class="line">newYearResolution &lt;| DateTime(<span class="number">2015</span>,<span class="number">10</span>,<span class="number">10</span>)</span><br></pre></td></tr></table></figure>
+<p><code>(|Q1|Q2|Q3|Q4|)</code> เป็น Pattern ที่ใช้หา Quarter ของ DateTime ที่รับเข้ามา สังเกตว่าฟังก์ชัน Match จะต้อง Return Q1 - Q4 ให้ครบ</p>
+<h2 id="Parameterized_Active_Pattern"><a href="#Parameterized_Active_Pattern" class="headerlink" title="Parameterized Active Pattern"></a>Parameterized Active Pattern</h2><p>เป็น Pattern ที่สามารถเพิ่ม Parameter ตัวที่สอง ซึ่งแตกต่างจาก Pattern แบบอื่นที่สามารถมี Parameter ตัวแรกเพียงตัวเดียว</p>
+<figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span>(|Divisible|_|) x y =</span><br><span class="line">    <span class="keyword">if</span> y % x = <span class="number">0</span> <span class="keyword">then</span> Some Divisible</span><br><span class="line">    <span class="keyword">else</span> None</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> f2 = <span class="keyword">function</span></span><br><span class="line">    | Divisible <span class="number">2</span> &amp; Divisible <span class="number">3</span> -&gt; <span class="string">"divisible by 6"</span></span><br><span class="line">    | _-&gt; <span class="string">"other"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// "divisible by 6"</span></span><br><span class="line">f2 <span class="number">12</span></span><br></pre></td></tr></table></figure>
+<p><code>Divisible</code> เป็น Pattern ที่รับ Parameter สองตัว คือ <code>x</code> และ <code>y</code> จะเห็นว่าขั้นตอนการเรียกใช้ คือ ในฟังก์ชั่น <code>f2</code> มีการส่ง Parameter ตัวแรก คือ <code>2</code> และ <code>3</code> จากนั้นตอนเรียกใช้ฟังก์ชั่น <code>f2</code> มีการส่ง Parameter ตัวที่สองคือ <code>12</code></p>
+
       
     </div>
     
@@ -98,6 +170,84 @@ ga('send', 'pageview');
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/fs/">fs</a></li></ul>
 
       </footer>
+    
+  </div>
+  
+</article>
+
+
+    
+      <article id="post-fsharp-inline-evaluation-with-lighttable" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/01/22/fsharp-inline-evaluation-with-lighttable/">เขียน F# แบบ Inline evaluation ด้วย Light Table</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2016/01/22/fsharp-inline-evaluation-with-lighttable/" class="article-date">
+  <time datetime="2016-01-22T12:38:28.000Z" itemprop="datePublished">2016-01-22</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>โปรแกรม <a href="http://lighttable.com" target="_blank" rel="external">Light Table</a> เป็น Text editor ที่สามารถเขียนโปรแกรมแบบ Inline evaluation คือ เราสามารถพิมพ์โค้ดและสั่ง Execute คำสั่งในบรรทัดนั้น เพื่อดูผลลัพธ์ได้ทันที</p>
+<p>ข้อดีของการเขียนโปรแกรมแบบนี้ คือ เราสามารถใช้ทดสอบโค้ดได้ง่าย ไม่ต้องใช้ IDE หรือเขียนโปรแกรมพิมพ์ผลลัพท์ผ่าน Console  ที่ความยุ่งยาก</p>
+<h2 id="u0E40_u0E04_u0E23_u0E37_u0E48_u0E2D_u0E07_u0E21_u0E37_u0E2D_u0E17_u0E35_u0E48_u0E15_u0E49_u0E2D_u0E07_u0E43_u0E0A_u0E49"><a href="#u0E40_u0E04_u0E23_u0E37_u0E48_u0E2D_u0E07_u0E21_u0E37_u0E2D_u0E17_u0E35_u0E48_u0E15_u0E49_u0E2D_u0E07_u0E43_u0E0A_u0E49" class="headerlink" title="เครื่องมือที่ต้องใช้"></a>เครื่องมือที่ต้องใช้</h2><ol>
+<li>โปรแกรม F# interactive fsharpi (Mac) / fsi (Windows)</li>
+<li>โปรแกรม Light Table</li>
+<li>F# Plugin ของ Light Table</li>
+</ol>
+<h2 id="u0E15_u0E34_u0E14_u0E15_u0E31_u0E49_u0E07_fsharpi_/_fsi"><a href="#u0E15_u0E34_u0E14_u0E15_u0E31_u0E49_u0E07_fsharpi_/_fsi" class="headerlink" title="ติดตั้ง fsharpi / fsi"></a>ติดตั้ง fsharpi / fsi</h2><ul>
+<li>Mac - <a href="http://fsharp.org/use/mac" target="_blank" rel="external">http://fsharp.org/use/mac</a></li>
+<li>Windows - <a href="http://fsharp.org/use/windows" target="_blank" rel="external">http://fsharp.org/use/windows</a></li>
+</ul>
+<h2 id="u0E15_u0E34_u0E14_u0E15_u0E31_u0E49_u0E07_Light_Table"><a href="#u0E15_u0E34_u0E14_u0E15_u0E31_u0E49_u0E07_Light_Table" class="headerlink" title="ติดตั้ง Light Table"></a>ติดตั้ง Light Table</h2><ul>
+<li>สามารถโหลดไฟล์ <a href="http://lighttable.com/" target="_blank" rel="external">Installer</a> จากเว็บไซต์ได้โดยตรง</li>
+</ul>
+<h2 id="u0E15_u0E34_u0E14_u0E15_u0E31_u0E49_u0E07_F_23_Plugin"><a href="#u0E15_u0E34_u0E14_u0E15_u0E31_u0E49_u0E07_F_23_Plugin" class="headerlink" title="ติดตั้ง F# Plugin"></a>ติดตั้ง F# Plugin</h2><p>หลังจากติดตั้ง Light Table สามารถติดตั้ง Plugin ผ่าน Plugin manager ตามขั้นตอนต่อไปนี้</p>
+<ol>
+<li>เปิดโปรแกรม Light Table</li>
+<li><p>เปิดหน้าต่าง Plugin manager โดยการกดปุ่ม <code>Ctlr + Space</code> พิมพ์คำว่า <code>plugin</code> แล้วคลิกเลือก <code>Show plugin manager</code></p>
+<p> <img src="/images/open-plugin-manager.png" alt=""></p>
+</li>
+<li><p>ในหน้า Plugin manager ให้ Search คำว่า <code>F#</code> แล้วคลิกปุ่ม Install ที่มุมด้านขวา</p>
+<p> <img src="/images/install-plugin.png" alt=""></p>
+</li>
+</ol>
+<h3 id="u0E01_u0E32_u0E23_u0E43_u0E0A_u0E49_u0E07_u0E32_u0E19"><a href="#u0E01_u0E32_u0E23_u0E43_u0E0A_u0E49_u0E07_u0E32_u0E19" class="headerlink" title="การใช้งาน"></a>การใช้งาน</h3><p>หนังจากติดตั้ง Plugin เราสามารถใช้งานได้ทันที่ ด้วยวิธีง่าย ๆ ดังนี้</p>
+<ol>
+<li>พิมพ์โคัด</li>
+<li>Hightlight บรรทัดที่ต้องการ</li>
+<li><p>กด <code>Alt + Enter</code></p>
+<p> <img src="/images/inline-evaluation.png" alt=""></p>
+</li>
+</ol>
+<p>จากตัวอย่าง</p>
+<ul>
+<li>ถ้าบรรทัดที่เลือก return void โปรแกรมจะแสดงเครื่องหมายถูก</li>
+<li>ส่วนบรรทัดที่ return ค่า โปรแกรมจะแสดงผลลัทธ์ที่ท้ายบรรทัด</li>
+</ul>
+<p>Links</p>
+<ul>
+<li>Light Table - <a href="http://lighttable.com" target="_blank" rel="external">http://lighttable.com</a></li>
+<li>F# Plugin - <a href="https://github.com/enricosada/LightTable-FSharp" target="_blank" rel="external">https://github.com/enricosada/LightTable-FSharp</a></li>
+<li>Use F# on Windows - <a href="http://fsharp.org/use/windows" target="_blank" rel="external">http://fsharp.org/use/windows</a></li>
+<li>Use F# on Mac - <a href="http://fsharp.org/use/mac" target="_blank" rel="external">http://fsharp.org/use/mac</a></li>
+</ul>
+
+      
+    </div>
+    
     
   </div>
   
@@ -189,7 +339,7 @@ ga('send', 'pageview');
 
 
     
-      <article id="post-const-and-readonly" class="article article-type-post" itemscope itemprop="blogPost">
+      <article id="post-csharp-const-and-readonly" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
     
@@ -197,14 +347,14 @@ ga('send', 'pageview');
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2016/01/18/const-and-readonly/">Const กับ Readonly</a>
+      <a class="article-title" href="/2016/01/18/csharp-const-and-readonly/">Const กับ Readonly</a>
     </h1>
   
 
       </header>
     
     <div class="article-meta">
-      <a href="/2016/01/18/const-and-readonly/" class="article-date">
+      <a href="/2016/01/18/csharp-const-and-readonly/" class="article-date">
   <time datetime="2016-01-18T15:22:24.000Z" itemprop="datePublished">2016-01-18</time>
 </a>
       
@@ -249,7 +399,7 @@ ga('send', 'pageview');
 
 
     
-      <article id="post-open-and-close-types" class="article article-type-post" itemscope itemprop="blogPost">
+      <article id="post-csharp-open-and-close-types" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
     
@@ -257,14 +407,14 @@ ga('send', 'pageview');
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2016/01/14/open-and-close-types/">Open กับ Closed Type</a>
+      <a class="article-title" href="/2016/01/14/csharp-open-and-close-types/">Open กับ Closed Type</a>
     </h1>
   
 
       </header>
     
     <div class="article-meta">
-      <a href="/2016/01/14/open-and-close-types/" class="article-date">
+      <a href="/2016/01/14/csharp-open-and-close-types/" class="article-date">
   <time datetime="2016-01-14T15:54:15.000Z" itemprop="datePublished">2016-01-14</time>
 </a>
       
@@ -300,7 +450,7 @@ ga('send', 'pageview');
 
 
     
-      <article id="post-covariance-and-contravariance" class="article article-type-post" itemscope itemprop="blogPost">
+      <article id="post-csharp-covariance-and-contravariance" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
     
@@ -308,14 +458,14 @@ ga('send', 'pageview');
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2016/01/14/covariance-and-contravariance/">Covariance กับ Contravariance (Draft)</a>
+      <a class="article-title" href="/2016/01/14/csharp-covariance-and-contravariance/">Covariance กับ Contravariance (Draft)</a>
     </h1>
   
 
       </header>
     
     <div class="article-meta">
-      <a href="/2016/01/14/covariance-and-contravariance/" class="article-date">
+      <a href="/2016/01/14/csharp-covariance-and-contravariance/" class="article-date">
   <time datetime="2016-01-14T08:31:49.000Z" itemprop="datePublished">2016-01-14</time>
 </a>
       
@@ -385,7 +535,7 @@ ga('send', 'pageview');
 
 
     
-      <article id="post-checked-and-unchecked" class="article article-type-post" itemscope itemprop="blogPost">
+      <article id="post-csharp-checked-and-unchecked" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
     
@@ -393,14 +543,14 @@ ga('send', 'pageview');
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2016/01/11/checked-and-unchecked/">Checked กับ Unchecked</a>
+      <a class="article-title" href="/2016/01/11/csharp-checked-and-unchecked/">Checked กับ Unchecked</a>
     </h1>
   
 
       </header>
     
     <div class="article-meta">
-      <a href="/2016/01/11/checked-and-unchecked/" class="article-date">
+      <a href="/2016/01/11/csharp-checked-and-unchecked/" class="article-date">
   <time datetime="2016-01-11T11:11:57.000Z" itemprop="datePublished">2016-01-11</time>
 </a>
       
@@ -464,7 +614,7 @@ ga('send', 'pageview');
 
 
     
-      <article id="post-keyword-and-bcl" class="article article-type-post" itemscope itemprop="blogPost">
+      <article id="post-csharp-keyword-and-bcl" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
     
@@ -472,14 +622,14 @@ ga('send', 'pageview');
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2016/01/10/keyword-and-bcl/">String กับ string</a>
+      <a class="article-title" href="/2016/01/10/csharp-keyword-and-bcl/">String กับ string</a>
     </h1>
   
 
       </header>
     
     <div class="article-meta">
-      <a href="/2016/01/10/keyword-and-bcl/" class="article-date">
+      <a href="/2016/01/10/csharp-keyword-and-bcl/" class="article-date">
   <time datetime="2016-01-10T11:11:57.000Z" itemprop="datePublished">2016-01-10</time>
 </a>
       
