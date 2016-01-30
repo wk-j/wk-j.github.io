@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="http://wk-j.gihub.io/"/>
-  <updated>2016-01-24T14:13:44.000Z</updated>
+  <updated>2016-01-30T08:40:52.000Z</updated>
   <id>http://wk-j.gihub.io/</id>
   
   <author>
@@ -15,11 +15,54 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title><![CDATA[Explicit conversion ใน C#]]></title>
+    <link href="http://wk-j.gihub.io/2016/01/30/csharp-explicit-conversion/"/>
+    <id>http://wk-j.gihub.io/2016/01/30/csharp-explicit-conversion/</id>
+    <published>2016-01-29T18:06:18.000Z</published>
+    <updated>2016-01-30T08:40:52.000Z</updated>
+    <content type="html"><![CDATA[<p>การแปลง type ใน C# มีหลายแบบ</p>
+<ul>
+<li>Implicit conversion - แปลงแบบอัติโนมัติโดย compiler</li>
+<li>Explicit conversion (cast) - แปลงโดยใช้ keyword <code>as</code> หรือ ใช้ operator cast</li>
+<li>User-define conversion - เขียน method สำหรับแปลง type ขึ้นเอง</li>
+<li>Helper class - ใช้ helper ที่มีอยู่แล้ว เช่น คลาส <code>Convert</code></li>
+</ul>
+<h2 id="Explicit_conversion"><a href="#Explicit_conversion" class="headerlink" title="Explicit conversion"></a>Explicit conversion</h2><h4 id="u0E43_u0E0A_u0E49_cast__28__29"><a href="#u0E43_u0E0A_u0E49_cast__28__29" class="headerlink" title="ใช้ cast (_)"></a>ใช้ cast <code>(_)</code></h4><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">object</span> x = ...;</span><br><span class="line"><span class="keyword">if</span> (x <span class="keyword">is</span> String) &#123;</span><br><span class="line">    <span class="keyword">var</span> str = (String) x;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Cast มักใช้คู่กับ <code>is</code> เพื่อทำ type checking สำหรับกัน error  <code>InvalidCastException</code> ในกรณีที่ CLR ไม่สามารถแปลง object ให้เป็น type ที่ต้องการได้</p>
+<h4 id="u0E43_u0E0A_u0E49_as"><a href="#u0E43_u0E0A_u0E49_as" class="headerlink" title="ใช้ as"></a>ใช้ <code>as</code></h4><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> str = x <span class="keyword">as</span> <span class="keyword">string</span>;</span><br><span class="line"><span class="keyword">if</span> (str != <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="comment">// Use str</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>การแปลง type โดยใช้ <code>as</code> จะช่วยลดขั้นตอน type checking และไม่มีทาง error เนื่องจาก operator <code>as</code> จะคืนค่า <code>null</code> ในกรณีที่ไม่สามารถแปลง type จะต่างจาก cast ที่จะเกิด error <code>InvalidCastException</code> ข้อจำกัดของ <code>as</code> คือใช้ได้กับ type ที่เป็น <code>Nullable</code> เท่านั้น</p>
+<h4 id="u0E43_u0E0A_u0E49_as__u0E43_u0E19_for"><a href="#u0E43_u0E0A_u0E49_as__u0E43_u0E19_for" class="headerlink" title="ใช้ as ใน for"></a>ใช้ <code>as</code> ใน <code>for</code></h4><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="keyword">var</span> str = x <span class="keyword">as</span> <span class="keyword">string</span>; str != <span class="keyword">null</span>; str = <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="comment">// Use str</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>เราสามารถใช้ <code>as</code> ว่างไว้ใน expression for เพื่อกันตังแปร <code>str</code> ให้อยู่ใน scope วิธีนี้เป็น programming trick ที่ทำให้โค้ดอ่านยาก จึงไม่นิยมใช้</p>
+<h2 id="Performance"><a href="#Performance" class="headerlink" title="Performance"></a>Performance</h2><p>การ convert type มีผลกับประสิทธิภาพของโปรแกรม ถ้าไม่สามารถหลีกเลี่ยงได้ ก็ควรทำให้น้อยที่สุด การใช้ <code>as</code> แทน cast จะช่วยลดจำนวน conversion ได้หนึ่งครั้ง เนื่องจากการทำ type checking ด้วย <code>is</code> จะเกิด type conversion เช่นกัน</p>
+<p>อย่างไรก็ตามการใช้ as กับข้อมูลประเภท <code>Nullable</code> ของ value type เช่น <code>int?</code> จะ drop performance ของโปรแกรมมากกว่าการใช้ <code>is</code> + cast อย่างมีนัยยสำคัญ เนื่องจากการแปลง value type ให้เป็น <code>Nullable</code> จะมี operator อื่นเพิ่มเข้ามา</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Test</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">int</span> Size = <span class="number">30000000</span>;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">object</span>[] values = <span class="keyword">new</span> <span class="keyword">object</span>[Size];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; Size - <span class="number">2</span>; i += <span class="number">3</span>) &#123;</span><br><span class="line">            values[i] = <span class="keyword">null</span>;</span><br><span class="line">            values[i+<span class="number">1</span>] = <span class="string">""</span>;</span><br><span class="line">            values[i+<span class="number">2</span>] = <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        FindSumWithCast(values);</span><br><span class="line">        FindSumWithAs(values);</span><br><span class="line">        FindSumWithLinq(values);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">FindSumWithCast</span>(<span class="params"><span class="keyword">object</span>[] values</span>) </span>&#123;</span><br><span class="line">        Stopwatch sw = Stopwatch.StartNew();</span><br><span class="line">        <span class="keyword">int</span> sum = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">foreach</span> (<span class="keyword">object</span> o <span class="keyword">in</span> values) &#123;</span><br><span class="line">            <span class="keyword">if</span> (o <span class="keyword">is</span> <span class="keyword">int</span>) &#123;</span><br><span class="line">                <span class="keyword">int</span> x = (<span class="keyword">int</span>) o;</span><br><span class="line">                sum += x;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        sw.Stop();</span><br><span class="line">        Console.WriteLine(<span class="string">"Cast: &#123;0&#125; : &#123;1&#125;"</span>, sum, (<span class="keyword">long</span>) sw.ElapsedMilliseconds);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">FindSumWithAs</span>(<span class="params"><span class="keyword">object</span>[] values</span>) </span>&#123;</span><br><span class="line">        Stopwatch sw = Stopwatch.StartNew();</span><br><span class="line">        <span class="keyword">int</span> sum = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">foreach</span> (<span class="keyword">object</span> o <span class="keyword">in</span> values) &#123;</span><br><span class="line">            <span class="keyword">int</span>? x = o <span class="keyword">as</span> <span class="keyword">int</span>?;</span><br><span class="line">            <span class="keyword">if</span> (x.HasValue) &#123;</span><br><span class="line">                sum += x.Value;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        sw.Stop();</span><br><span class="line">        Console.WriteLine(<span class="string">"As: &#123;0&#125; : &#123;1&#125;"</span>, sum, (<span class="keyword">long</span>) sw.ElapsedMilliseconds);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">FindSumWithLinq</span>(<span class="params"><span class="keyword">object</span>[] values</span>) </span>&#123;</span><br><span class="line">        Stopwatch sw = Stopwatch.StartNew();</span><br><span class="line">        <span class="keyword">int</span> sum = values.OfType&lt;<span class="keyword">int</span>&gt;().Sum();</span><br><span class="line">        sw.Stop();</span><br><span class="line">        Console.WriteLine(<span class="string">"LINQ: &#123;0&#125; : &#123;1&#125;"</span>, sum, (<span class="keyword">long</span>) sw.ElapsedMilliseconds);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>จากตัวอย่าง <code>FindSumWithCast</code> การ cast แบบปกติ สามารถ <code>unbox</code> object ให้เป็น type <code>int</code> ได้โดยตรง ส่วน <code>FindWithAs</code> จะต้อง <code>unbox</code> ให้เป็น <code>Nullable int</code> หรือ <code>int?</code> ซึ่งจะมี internal operation เกิดขึ้นในฟังก์ชั่น <code>JIT_Unbox_Nullable</code> ของ <code>JIT</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Cast: <span class="number">10000000</span> : <span class="number">74</span></span><br><span class="line">As: <span class="number">10000000</span> : <span class="number">316</span></span><br><span class="line">LINQ: <span class="number">10000000</span> : <span class="number">913</span></span><br></pre></td></tr></table></figure>
+<p>ผลลัพทธ์ในเคสนี้ จะเห็นว่า cast ให้ประสิทธิภาพที่ดีกว่าการใช้ <code>as</code> ถึงแม้จะมี type conversion เกิดขึ้นสองครั้งก็ตาม</p>
+<p>Links</p>
+<ul>
+<li><a href="https://msdn.microsoft.com/en-us/library/ms173105.aspx" target="_blank" rel="external">https://msdn.microsoft.com/en-us/library/ms173105.aspx</a></li>
+<li><a href="http://stackoverflow.com/questions/1583050/performance-surprise-with-as-and-nullable-types" target="_blank" rel="external">http://stackoverflow.com/questions/1583050/performance-surprise-with-as-and-nullable-types</a></li>
+<li><a href="http://ericlippert.com/2015/10/14/casts-and-type-parameters-do-not-mix" target="_blank" rel="external">http://ericlippert.com/2015/10/14/casts-and-type-parameters-do-not-mix</a></li>
+</ul>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>การแปลง type ใน C# มีหลายแบบ</p>
+<ul>
+<li>Implicit conversion - แปลงแบบอัติโนมัติโดย compiler</li>
+<li>Explicit conversion (cast) - แปลงโ]]>
+    </summary>
+    
+      <category term="cs" scheme="http://wk-j.gihub.io/tags/cs/"/>
+    
+  </entry>
+  
+  <entry>
     <title><![CDATA[Fizz Buzz in F#]]></title>
     <link href="http://wk-j.gihub.io/2016/01/24/fsharp-fizz-buzz/"/>
     <id>http://wk-j.gihub.io/2016/01/24/fsharp-fizz-buzz/</id>
     <published>2016-01-24T09:46:08.000Z</published>
-    <updated>2016-01-24T14:13:44.000Z</updated>
+    <updated>2016-01-27T07:47:23.000Z</updated>
     <content type="html"><![CDATA[<h2 id="Fuzz_Buzz"><a href="#Fuzz_Buzz" class="headerlink" title="Fuzz Buzz"></a>Fuzz Buzz</h2><p>Fizz Buzz เป็นโจทย์ที่นิยมใช้สำหรับ ทดสอบการเขียนโปรแกรม กฎคือ ให้เขียนโปรแกรมที่รันเลขตั้งแต่ 1 - 100 โดย</p>
 <ol>
 <li>ถ้าเลขนั้นหาร 3 ลงตัวให้พิมพ์ <code>Fizz</code></li>
@@ -36,7 +79,7 @@
 <p>หรือใช้ Partial case เดียว คือ <code>DivisibleBy</code> ซึ่งเป็น Optimize version ของแบบแรก</p>
 <figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> (|DivisibleBy|_|) divisor i =</span><br><span class="line">    <span class="keyword">if</span> i % divisor = <span class="number">0</span> <span class="keyword">then</span> Some () <span class="keyword">else</span> None</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="number">1.</span><span class="number">.100</span> <span class="keyword">do</span></span><br><span class="line">    <span class="keyword">match</span> i <span class="keyword">with</span></span><br><span class="line">    | DivisibleBy <span class="number">3</span> &amp; DivisibleBy <span class="number">5</span> -&gt; printfn <span class="string">"FizzBuzz"</span></span><br><span class="line">    | DivisibleBy <span class="number">3</span> -&gt; printfn <span class="string">"Fizz"</span></span><br><span class="line">    | DivisibleBy <span class="number">5</span> -&gt; printfn <span class="string">"Buzz"</span></span><br><span class="line">    | _ -&gt; printfn <span class="string">"%d"</span> i</span><br></pre></td></tr></table></figure>
 <h2 id="Computation_expression"><a href="#Computation_expression" class="headerlink" title="Computation expression"></a>Computation expression</h2><p>วิธีที่ยากสุด คือ เขียนด้วย Computation expression</p>
-<figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">type</span> <span class="title">M</span>&lt;<span class="title">'T</span>&gt;  </span>= M <span class="keyword">of</span> <span class="attribute">'T</span></span><br><span class="line"><span class="class"><span class="keyword">type</span> <span class="title">MonadBuilder</span></span>() =</span><br><span class="line">    <span class="keyword">member</span> this.Return x = M x</span><br><span class="line"><span class="keyword">let</span> m = <span class="keyword">new</span> MonadBuilder()</span><br><span class="line"><span class="keyword">let</span> fizz = <span class="keyword">function</span></span><br><span class="line">    | x <span class="keyword">when</span> x % <span class="number">3</span> = <span class="number">0</span>  -&gt; m &#123; <span class="keyword">return</span> x, <span class="string">"Fizz"</span>&#125;</span><br><span class="line">    | x -&gt; m &#123; <span class="keyword">return</span> x, <span class="string">""</span> &#125;</span><br><span class="line"><span class="keyword">let</span> buzz = <span class="keyword">function</span></span><br><span class="line">    | M (x,s) <span class="keyword">when</span> x % <span class="number">5</span> = <span class="number">0</span> -&gt; m &#123; <span class="keyword">return</span> x, s + <span class="string">"Buzz"</span> &#125;</span><br><span class="line">    | M (x,s) -&gt; m &#123; <span class="keyword">return</span> x, s &#125;</span><br><span class="line">[<span class="number">1.</span><span class="number">.100</span>] |&gt; List.map(fizz) |&gt; List.map(buzz) |&gt; printfn <span class="string">"%A"</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">type</span> <span class="title">M</span>&lt;<span class="title">'T</span>&gt;  </span>= M <span class="keyword">of</span> <span class="attribute">'T</span></span><br><span class="line"><span class="class"><span class="keyword">type</span> <span class="title">MonadBuilder</span></span>() =</span><br><span class="line">    <span class="keyword">member</span> this.Return x = M x</span><br><span class="line"><span class="keyword">let</span> m = MonadBuilder()</span><br><span class="line"><span class="keyword">let</span> fizz = <span class="keyword">function</span></span><br><span class="line">    | x <span class="keyword">when</span> x % <span class="number">3</span> = <span class="number">0</span>  -&gt; m &#123; <span class="keyword">return</span> x, <span class="string">"Fizz"</span>&#125;</span><br><span class="line">    | x -&gt; m &#123; <span class="keyword">return</span> x, x.ToString() &#125;</span><br><span class="line"><span class="keyword">let</span> buzz = <span class="keyword">function</span></span><br><span class="line">    | M (x,s) <span class="keyword">when</span> x % <span class="number">5</span> = <span class="number">0</span> -&gt; m &#123; <span class="keyword">return</span> x, s + <span class="string">"Buzz"</span> &#125;</span><br><span class="line">    | M (x,<span class="string">""</span>) -&gt; m &#123; <span class="keyword">return</span> x, x.ToString() &#125;</span><br><span class="line">    | M (x,s) -&gt; m &#123; <span class="keyword">return</span> x, s &#125;</span><br><span class="line"></span><br><span class="line">[<span class="number">1.</span><span class="number">.100</span>]</span><br><span class="line">|&gt; List.map(fizz &gt;&gt; buzz)</span><br><span class="line">|&gt; List.iter(<span class="keyword">fun</span> (M (_,s)) -&gt; printfn <span class="string">"%A"</span> s)</span><br></pre></td></tr></table></figure>
 <p>Links</p>
 <ul>
 <li><a href="http://stackoverflow.com/questions/2422697/how-to-code-fizzbuzz-in-f" target="_blank" rel="external">http://stackoverflow.com/questions/2422697/how-to-code-fizzbuzz-in-f</a></li>
@@ -74,122 +117,6 @@
 ]]></content>
     <summary type="html">
     <![CDATA[<p>F# มี syntax พิเศษที่ช่วยให้เขียน Pattern matching ได้ง่ายขึ้น โดยใช้โครงสร้างคล้าย ๆ กับ <a href="https://msdn.microsoft.com/en-us/libra]]>
-    </summary>
-    
-      <category term="fs" scheme="http://wk-j.gihub.io/tags/fs/"/>
-    
-  </entry>
-  
-  <entry>
-    <title><![CDATA[เขียน F# แบบ Inline evaluation ด้วย Light Table]]></title>
-    <link href="http://wk-j.gihub.io/2016/01/22/fsharp-inline-evaluation-with-lighttable/"/>
-    <id>http://wk-j.gihub.io/2016/01/22/fsharp-inline-evaluation-with-lighttable/</id>
-    <published>2016-01-22T12:38:28.000Z</published>
-    <updated>2016-01-23T04:51:45.000Z</updated>
-    <content type="html"><![CDATA[<p>โปรแกรม <a href="http://lighttable.com" target="_blank" rel="external">Light Table</a> เป็น Text editor ที่สามารถเขียนโปรแกรมแบบ Inline evaluation คือ เราสามารถพิมพ์โค้ดและสั่ง Execute คำสั่งในบรรทัดนั้น เพื่อดูผลลัพธ์ได้ทันที</p>
-<p>ข้อดีของการเขียนโปรแกรมแบบนี้ คือ เราสามารถใช้ทดสอบโค้ดได้ง่าย ไม่ต้องใช้ IDE หรือเขียนโปรแกรมพิมพ์ผลลัพท์ผ่าน Console  ที่ความยุ่งยาก</p>
-<h2 id="u0E40_u0E04_u0E23_u0E37_u0E48_u0E2D_u0E07_u0E21_u0E37_u0E2D_u0E17_u0E35_u0E48_u0E15_u0E49_u0E2D_u0E07_u0E43_u0E0A_u0E49"><a href="#u0E40_u0E04_u0E23_u0E37_u0E48_u0E2D_u0E07_u0E21_u0E37_u0E2D_u0E17_u0E35_u0E48_u0E15_u0E49_u0E2D_u0E07_u0E43_u0E0A_u0E49" class="headerlink" title="เครื่องมือที่ต้องใช้"></a>เครื่องมือที่ต้องใช้</h2><ol>
-<li>โปรแกรม F# interactive fsharpi (Mac) / fsi (Windows)</li>
-<li>โปรแกรม Light Table</li>
-<li>F# Plugin ของ Light Table</li>
-</ol>
-<h2 id="u0E15_u0E34_u0E14_u0E15_u0E31_u0E49_u0E07_fsharpi_/_fsi"><a href="#u0E15_u0E34_u0E14_u0E15_u0E31_u0E49_u0E07_fsharpi_/_fsi" class="headerlink" title="ติดตั้ง fsharpi / fsi"></a>ติดตั้ง fsharpi / fsi</h2><ul>
-<li>Mac - <a href="http://fsharp.org/use/mac" target="_blank" rel="external">http://fsharp.org/use/mac</a></li>
-<li>Windows - <a href="http://fsharp.org/use/windows" target="_blank" rel="external">http://fsharp.org/use/windows</a></li>
-</ul>
-<h2 id="u0E15_u0E34_u0E14_u0E15_u0E31_u0E49_u0E07_Light_Table"><a href="#u0E15_u0E34_u0E14_u0E15_u0E31_u0E49_u0E07_Light_Table" class="headerlink" title="ติดตั้ง Light Table"></a>ติดตั้ง Light Table</h2><ul>
-<li>สามารถโหลดไฟล์ <a href="http://lighttable.com/" target="_blank" rel="external">Installer</a> จากเว็บไซต์ได้โดยตรง</li>
-</ul>
-<h2 id="u0E15_u0E34_u0E14_u0E15_u0E31_u0E49_u0E07_F_23_Plugin"><a href="#u0E15_u0E34_u0E14_u0E15_u0E31_u0E49_u0E07_F_23_Plugin" class="headerlink" title="ติดตั้ง F# Plugin"></a>ติดตั้ง F# Plugin</h2><p>หลังจากติดตั้ง Light Table สามารถติดตั้ง Plugin ผ่าน Plugin manager ตามขั้นตอนต่อไปนี้</p>
-<ol>
-<li>เปิดโปรแกรม Light Table</li>
-<li><p>เปิดหน้าต่าง Plugin manager โดยการกดปุ่ม <code>Ctlr + Space</code> พิมพ์คำว่า <code>plugin</code> แล้วคลิกเลือก <code>Show plugin manager</code></p>
-<p> <img src="/images/open-plugin-manager.png" alt=""></p>
-</li>
-<li><p>ในหน้า Plugin manager ให้ Search คำว่า <code>F#</code> แล้วคลิกปุ่ม Install ที่มุมด้านขวา</p>
-<p> <img src="/images/install-plugin.png" alt=""></p>
-</li>
-</ol>
-<h3 id="u0E01_u0E32_u0E23_u0E43_u0E0A_u0E49_u0E07_u0E32_u0E19"><a href="#u0E01_u0E32_u0E23_u0E43_u0E0A_u0E49_u0E07_u0E32_u0E19" class="headerlink" title="การใช้งาน"></a>การใช้งาน</h3><p>หนังจากติดตั้ง Plugin เราสามารถใช้งานได้ทันที่ ด้วยวิธีง่าย ๆ ดังนี้</p>
-<ol>
-<li>พิมพ์โคัด</li>
-<li>Hightlight บรรทัดที่ต้องการ</li>
-<li><p>กด <code>Alt + Enter</code></p>
-<p> <img src="/images/inline-evaluation.png" alt=""></p>
-</li>
-</ol>
-<p>จากตัวอย่าง</p>
-<ul>
-<li>ถ้าบรรทัดที่เลือก return void โปรแกรมจะแสดงเครื่องหมายถูก</li>
-<li>ส่วนบรรทัดที่ return ค่า โปรแกรมจะแสดงผลลัทธ์ที่ท้ายบรรทัด</li>
-</ul>
-<p>Links</p>
-<ul>
-<li>Light Table - <a href="http://lighttable.com" target="_blank" rel="external">http://lighttable.com</a></li>
-<li>F# Plugin - <a href="https://github.com/enricosada/LightTable-FSharp" target="_blank" rel="external">https://github.com/enricosada/LightTable-FSharp</a></li>
-<li>Use F# on Windows - <a href="http://fsharp.org/use/windows" target="_blank" rel="external">http://fsharp.org/use/windows</a></li>
-<li>Use F# on Mac - <a href="http://fsharp.org/use/mac" target="_blank" rel="external">http://fsharp.org/use/mac</a></li>
-</ul>
-]]></content>
-    <summary type="html">
-    <![CDATA[<p>โปรแกรม <a href="http://lighttable.com" target="_blank" rel="external">Light Table</a> เป็น Text editor ที่สามารถเขียนโปรแกรมแบบ Inline e]]>
-    </summary>
-    
-  </entry>
-  
-  <entry>
-    <title><![CDATA[เขียน F# แบบ Inline evaluation ด้วย Light Table]]></title>
-    <link href="http://wk-j.gihub.io/2016/01/22/fsharp-inline-evaluation-with-light-table/"/>
-    <id>http://wk-j.gihub.io/2016/01/22/fsharp-inline-evaluation-with-light-table/</id>
-    <published>2016-01-22T12:38:28.000Z</published>
-    <updated>2016-01-23T14:43:38.000Z</updated>
-    <content type="html"><![CDATA[<p>โปรแกรม <a href="http://lighttable.com" target="_blank" rel="external">Light Table</a> เป็น Text editor ที่สามารถเขียนโปรแกรมแบบ Inline evaluation คือ เราสามารถพิมพ์โค้ดและสั่ง Execute คำสั่งในบรรทัดนั้น เพื่อดูผลลัพธ์ได้ทันที</p>
-<p>ข้อดีของการเขียนโปรแกรมแบบนี้ คือ เราสามารถใช้ทดสอบโค้ดได้ง่าย ไม่ต้องใช้ IDE หรือเขียนโปรแกรมพิมพ์ผลลัพธ์ผ่าน Console  ที่มีความยุ่งยาก</p>
-<h2 id="u0E40_u0E04_u0E23_u0E37_u0E48_u0E2D_u0E07_u0E21_u0E37_u0E2D_u0E17_u0E35_u0E48_u0E15_u0E49_u0E2D_u0E07_u0E43_u0E0A_u0E49"><a href="#u0E40_u0E04_u0E23_u0E37_u0E48_u0E2D_u0E07_u0E21_u0E37_u0E2D_u0E17_u0E35_u0E48_u0E15_u0E49_u0E2D_u0E07_u0E43_u0E0A_u0E49" class="headerlink" title="เครื่องมือที่ต้องใช้"></a>เครื่องมือที่ต้องใช้</h2><ol>
-<li>โปรแกรม F# interactive fsharpi (Mac) / fsi (Windows)</li>
-<li>โปรแกรม Light Table</li>
-<li>F# plugin ของ Light Table</li>
-</ol>
-<h2 id="u0E15_u0E34_u0E14_u0E15_u0E31_u0E49_u0E07_fsharpi_/_fsi"><a href="#u0E15_u0E34_u0E14_u0E15_u0E31_u0E49_u0E07_fsharpi_/_fsi" class="headerlink" title="ติดตั้ง fsharpi / fsi"></a>ติดตั้ง fsharpi / fsi</h2><ul>
-<li>Mac - <a href="http://fsharp.org/use/mac" target="_blank" rel="external">http://fsharp.org/use/mac</a></li>
-<li>Windows - <a href="http://fsharp.org/use/windows" target="_blank" rel="external">http://fsharp.org/use/windows</a></li>
-</ul>
-<h2 id="u0E15_u0E34_u0E14_u0E15_u0E31_u0E49_u0E07_Light_Table"><a href="#u0E15_u0E34_u0E14_u0E15_u0E31_u0E49_u0E07_Light_Table" class="headerlink" title="ติดตั้ง Light Table"></a>ติดตั้ง Light Table</h2><ul>
-<li>สามารถโหลดไฟล์ <a href="http://lighttable.com/" target="_blank" rel="external">Installer</a> จากเว็บไซต์ได้โดยตรง</li>
-</ul>
-<h2 id="u0E15_u0E34_u0E14_u0E15_u0E31_u0E49_u0E07_F_23_plugin"><a href="#u0E15_u0E34_u0E14_u0E15_u0E31_u0E49_u0E07_F_23_plugin" class="headerlink" title="ติดตั้ง F# plugin"></a>ติดตั้ง F# plugin</h2><p>หลังจากติดตั้ง Light Table สามารถติดตั้ง Plugin ผ่าน Plugin manager ตามขั้นตอนต่อไปนี้</p>
-<ol>
-<li>เปิดโปรแกรม Light Table</li>
-<li><p>เปิดหน้าต่าง Plugin manager โดยการกดปุ่ม <code>Ctrl + Space</code> พิมพ์คำว่า <code>plugin</code> แล้วคลิกเลือก <code>Show plugin manager</code></p>
-<p> <img src="/images/open-plugin-manager.png" alt=""></p>
-</li>
-<li><p>ในหน้า Plugin manager ให้ Search คำว่า <code>F#</code> แล้วคลิกปุ่ม Install ที่มุมด้านขวา</p>
-<p> <img src="/images/install-plugin.png" alt=""></p>
-</li>
-</ol>
-<h2 id="u0E01_u0E32_u0E23_u0E43_u0E0A_u0E49_u0E07_u0E32_u0E19"><a href="#u0E01_u0E32_u0E23_u0E43_u0E0A_u0E49_u0E07_u0E32_u0E19" class="headerlink" title="การใช้งาน"></a>การใช้งาน</h2><p>หนังจากติดตั้ง Plugin เราสามารถใช้งานได้ทันที่ ด้วยวิธีง่าย ๆ ดังนี้</p>
-<ol>
-<li>พิมพ์โคัด</li>
-<li>Hightlight บรรทัดที่ต้องการ</li>
-<li><p>กด <code>Ctrl + Enter</code> (Windows) / <code>Command + Enterl</code> (Mac)</p>
-<p> <img src="/images/inline-evaluation.png" alt=""></p>
-</li>
-</ol>
-<p>จากตัวอย่าง</p>
-<ul>
-<li>ถ้าบรรทัดที่เลือก return void โปรแกรมจะแสดงเครื่องหมายถูก</li>
-<li>ส่วนบรรทัดที่ return ค่า โปรแกรมจะแสดงผลลัทธ์ที่ท้ายบรรทัด</li>
-</ul>
-<p>Links</p>
-<ul>
-<li>Light Table - <a href="http://lighttable.com" target="_blank" rel="external">http://lighttable.com</a></li>
-<li>F# plugin - <a href="https://github.com/enricosada/LightTable-FSharp" target="_blank" rel="external">https://github.com/enricosada/LightTable-FSharp</a></li>
-<li>Use F# on Windows - <a href="http://fsharp.org/use/windows" target="_blank" rel="external">http://fsharp.org/use/windows</a></li>
-<li>Use F# on Mac - <a href="http://fsharp.org/use/mac" target="_blank" rel="external">http://fsharp.org/use/mac</a></li>
-</ul>
-]]></content>
-    <summary type="html">
-    <![CDATA[<p>โปรแกรม <a href="http://lighttable.com" target="_blank" rel="external">Light Table</a> เป็น Text editor ที่สามารถเขียนโปรแกรมแบบ Inline e]]>
     </summary>
     
       <category term="fs" scheme="http://wk-j.gihub.io/tags/fs/"/>
