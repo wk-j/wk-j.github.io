@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="http://wk-j.gihub.io/"/>
-  <updated>2016-01-30T10:33:04.000Z</updated>
+  <updated>2016-01-30T19:14:20.000Z</updated>
   <id>http://wk-j.gihub.io/</id>
   
   <author>
@@ -13,6 +13,39 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[User-Defined Conversion ใน C#]]></title>
+    <link href="http://wk-j.gihub.io/2016/01/31/csharp-user-defined-conversion/"/>
+    <id>http://wk-j.gihub.io/2016/01/31/csharp-user-defined-conversion/</id>
+    <published>2016-01-30T17:09:02.000Z</published>
+    <updated>2016-01-30T19:14:20.000Z</updated>
+    <content type="html"><![CDATA[<h2 id="Implicit__u0E01_u0E31_u0E1A_Explicit_Conversion"><a href="#Implicit__u0E01_u0E31_u0E1A_Explicit_Conversion" class="headerlink" title="Implicit กับ Explicit Conversion"></a>Implicit กับ Explicit Conversion</h2><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">float</span> f = <span class="number">105.5</span>f;</span><br><span class="line"><span class="keyword">double</span> d = f;</span><br></pre></td></tr></table></figure>
+<p><code>float</code> <code>f</code> สามารถแปลงเป็น <code>double</code> <code>d</code> ผ่านการ assign ด้วยเครื่องหมาย <code>=</code> แบบอัตโนมัติ การ convert type แบบนี้เรียกว่า implicit conversion</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">double</span> d = <span class="number">305.5</span>;</span><br><span class="line"><span class="keyword">float</span> f = (<span class="keyword">float</span>) d;</span><br></pre></td></tr></table></figure>
+<p>ในทางตรงกันข้าม เราไม่สามารถแปลง <code>double</code> <code>d</code> เป็น <code>float</code> <code>f</code> ได้โดยตรง ต้องใช้ operator cast โดยระบุ <code>float</code> เป็น parameter เราเรียก convert ที่ต้องระบุ type ปลายทางว่า explicit conversion</p>
+<h2 id="User-Defined_Conversion"><a href="#User-Defined_Conversion" class="headerlink" title="User-Defined Conversion"></a>User-Defined Conversion</h2><p>เนื่องจาก <code>float</code> และ <code>double</code> เป็น <code>build-in</code> <code>type</code> เราจึงสามารถใช้คุณบัติ <code>implict</code> และ <code>explict conversion</code> ที่มีอยู่</p>
+<p>ในกรณีที่ประกาศใหม่ เราสามารถเขียน operator สำหรับ convert type โดยใช้ keyword <code>implicit</code> และ <code>explicit</code> โดย operator ต้องประกาศเป็น <code>public</code> <code>static</code> เสมอ</p>
+<h4 id="Implict"><a href="#Implict" class="headerlink" title="Implict"></a>Implict</h4><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">MagicNumber</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> Number &#123; <span class="keyword">set</span>; <span class="keyword">get</span>;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">implicit</span> <span class="keyword">operator</span> <span class="title">MagicNumber</span>(<span class="params"><span class="keyword">int</span> <span class="keyword">value</span></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> MagicNumber &#123; Number = <span class="keyword">value</span> &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>จากตัวอย่าง ในคลาส <code>MagicNumber</code> มีการใช้ keyword <code>implicit</code> <code>operator</code> เพื่อ overload operator ชื่อ <code>MagicNumber</code> ซึ่งรับ <code>int</code> ตัวเดียวเป็น parameter สิ่งที่ได้จากการ overload ชื่อคลาสลักษณะนี้ จะทำให้ <code>MagicNumber</code> มีคุณสมบัติ <code>implicit conversion</code></p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> i = <span class="number">3</span>;</span><br><span class="line">MagicNumber n = i;</span><br></pre></td></tr></table></figure>
+<p>คุณสมบัติที่เพิ่มเข้ามาใหม่ ทำให้ <code>MagicNumber n</code> สามารถ assign ค่าใหม่ที่มี type <code>int</code> ได้โดยตรง</p>
+<h4 id="Explicit"><a href="#Explicit" class="headerlink" title="Explicit"></a>Explicit</h4><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">explicit</span> <span class="keyword">operator</span> <span class="title">int</span>(<span class="params">MagicNumber <span class="keyword">value</span></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">value</span>.Number;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>การเขียน <code>explict convertsion</code> ต่างจาก <code>implict convertsion</code> เล็กน้อย คือ เปลี่ยนจาก keyword <code>implicit</code> เป็น <code>explicit</code> เท่านั้น</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">MagicNumber n = <span class="keyword">new</span> MagicNumber &#123; Number = <span class="number">2</span> &#125;;</span><br><span class="line"><span class="keyword">int</span> i = (<span class="keyword">int</span>) n;</span><br></pre></td></tr></table></figure>
+<p>Links</p>
+<ul>
+<li><a href="https://msdn.microsoft.com/en-us/library/aa288476(v=vs.71).aspx" target="_blank" rel="external">https://msdn.microsoft.com/en-us/library/aa288476(v=vs.71).aspx</a></li>
+<li><a href="http://rbwhitaker.wikidot.com/c-sharp-user-defined-conversions" target="_blank" rel="external">http://rbwhitaker.wikidot.com/c-sharp-user-defined-conversions</a></li>
+</ul>
+]]></content>
+    <summary type="html">
+    <![CDATA[<h2 id="Implicit__u0E01_u0E31_u0E1A_Explicit_Conversion"><a href="#Implicit__u0E01_u0E31_u0E1A_Explicit_Conversion" class="headerlink" title]]>
+    </summary>
+    
+      <category term="cs" scheme="http://wk-j.gihub.io/tags/cs/"/>
+    
+  </entry>
   
   <entry>
     <title><![CDATA[Explicit conversion ใน C#]]></title>
