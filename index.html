@@ -61,6 +61,56 @@ ga('send', 'pageview');
   </div>
 </header>
     <section id="main" class="outer">
+      <article id="post-csharp-string-concat-and-string-builder" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/02/02/csharp-string-concat-and-string-builder/">+ กับ StringBuilder</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2016/02/02/csharp-string-concat-and-string-builder/" class="article-date">
+  <time datetime="2016-02-02T04:04:13.000Z" itemprop="datePublished">2016-02-02</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Concat_String__u0E14_u0E49_u0E27_u0E22_u0E40_u0E04_u0E23_u0E37_u0E48_u0E2D_u0E07_u0E2B_u0E21_u0E32_u0E22_+"><a href="#Concat_String__u0E14_u0E49_u0E27_u0E22_u0E40_u0E04_u0E23_u0E37_u0E48_u0E2D_u0E07_u0E2B_u0E21_u0E32_u0E22_+" class="headerlink" title="Concat String ด้วยเครื่องหมาย +"></a>Concat String ด้วยเครื่องหมาย +</h2><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">DateTime start = DateTime.Now;</span><br><span class="line"><span class="keyword">string</span> x = <span class="string">""</span>;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i &lt; <span class="number">100000</span>; i++) &#123;</span><br><span class="line"> x += <span class="string">"!"</span>;</span><br><span class="line">&#125;</span><br><span class="line">DateTime end = DateTime.Now;</span><br><span class="line">Console.WriteLine (<span class="string">"Time taken: &#123;0&#125;"</span>, end-start);</span><br></pre></td></tr></table></figure>
+<p>เนื่องจาก <code>string</code> เป็น immutable type ทุกครั้งที่ <code>x += &quot;!&quot;</code> ทำงานจะมีการสร้าง <code>string</code> ขึ้นใหม่ โดยคัดลอก <code>string</code> เดิมต่อกับเครื่องหมาย <code>!</code> ไปเก็บใน memory ที่มีการ allocate ขึ้นใหม่ จากโค้ดข้างบนจะมีการคัดลอก <code>string</code> ถึง 100,000 ครั้ง แต่ละครั้งจะใช้เวลามากขึ้นเรื่อยๆ เนื่องจากจากขนาดของ <code>string</code> ยาวขึ้น</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Time taken: <span class="number">00</span>:<span class="number">00</span>:<span class="number">09.3561040</span></span><br></pre></td></tr></table></figure>
+<h2 id="Concat_String__u0E14_u0E49_u0E27_u0E22_StringBuilder"><a href="#Concat_String__u0E14_u0E49_u0E27_u0E22_StringBuilder" class="headerlink" title="Concat String ด้วย StringBuilder"></a>Concat String ด้วย StringBuilder</h2><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">DateTime start = DateTime.Now;</span><br><span class="line">StringBuilder builder = <span class="keyword">new</span> StringBuilder();</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i &lt; <span class="number">100000</span>; i++) &#123;</span><br><span class="line">    builder.Append(<span class="string">"!"</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">string</span> x = builder.ToString();</span><br><span class="line">DateTime end = DateTime.Now;</span><br><span class="line">Console.WriteLine (<span class="string">"Time taken: &#123;0&#125;"</span>, end-start);</span><br></pre></td></tr></table></figure>
+<p>StringBuilder จะมี buffer อยู่ภายใน เมื่อมีการการต่อ string ด้วยฟังก์ชัน <code>Append</code> จะไม่จำเป็นต้องจอง memory ใหม่ทุกรอบ แต่จะเกิดขึ้นก็ต่อเมื่อ memory หรือ buffer ที่มีอยู่ไม่พอ โดยจะเพิ่มขนาดของ buffer เป็นสองเท่าของขนาดเดิม จากโค้ดทั้งสองแบบจึงเห็นได้ว่า ในกรณีที่มีการต่อ <code>string</code> จำนวนมาก การใช้ <code>StringBuilder</code> จะให้ประสิทธิภาพที่ดีกว่า</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Time taken: <span class="number">00</span>:<span class="number">00</span>:<span class="number">00.0527960</span></span><br></pre></td></tr></table></figure>
+<p>Links</p>
+<ul>
+<li><a href="http://jonskeet.uk/csharp/stringbuilder.html" target="_blank" rel="external">http://jonskeet.uk/csharp/stringbuilder.html</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/cs/">cs</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+</article>
+
+
+    
       <article id="post-csharp-user-defined-conversion" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -659,71 +709,9 @@ ga('send', 'pageview');
 
 
     
-      <article id="post-csharp-keyword-and-bcl" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/01/10/csharp-keyword-and-bcl/">String กับ string</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-meta">
-      <a href="/2016/01/10/csharp-keyword-and-bcl/" class="article-date">
-  <time datetime="2016-01-10T11:11:57.000Z" itemprop="datePublished">2016-01-10</time>
-</a>
-      
-      
-    </div>
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>ใน C# จะมี alias ที่ match กับ type ใน <a href="https://en.wikipedia.org/wiki/List_of_data_types_of_the_Standard_Libraries#Base_Class_Library" target="_blank" rel="external">base class library (BCL)</a> เป็น keyword ตัวพิมพ์เล็ก เช่น System.String มี alias คือ string ทั้ง String ใหญ่และ string เล็กในทางเทคนิกแล้วสามารถใช้แทนกันได้</p>
-<p>Alias ของ C# มีทั้งหมด 15 ตัว โดย map อยู่กับ BCL type ดังนี้</p>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">object</span>:  System.Object</span><br><span class="line"><span class="keyword">string</span>:  System.String</span><br><span class="line"><span class="keyword">bool</span>:    System.Boolean</span><br><span class="line"><span class="keyword">byte</span>:    System.Byte</span><br><span class="line"><span class="keyword">sbyte</span>:   System.SByte</span><br><span class="line"><span class="keyword">short</span>:   System.Int16</span><br><span class="line"><span class="keyword">ushort</span>:  System.UInt16</span><br><span class="line"><span class="keyword">int</span>:     System.Int32</span><br><span class="line"><span class="keyword">uint</span>:    System.UInt32</span><br><span class="line"><span class="keyword">long</span>:    System.Int64</span><br><span class="line"><span class="keyword">ulong</span>:   System.UInt64</span><br><span class="line"><span class="keyword">float</span>:   System.Single</span><br><span class="line"><span class="keyword">double</span>:  System.Double</span><br><span class="line"><span class="keyword">decimal</span>: System.Decimal</span><br><span class="line"><span class="keyword">char</span>:    System.Char</span><br></pre></td></tr></table></figure>
-<p>Alias ทุกตัว คือ keyword ของภาษา</p>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">as</span> <span class="keyword">base</span> <span class="keyword">bool</span> <span class="keyword">break</span> <span class="keyword">byte</span> <span class="keyword">case</span> <span class="keyword">catch</span> <span class="keyword">char</span> <span class="keyword">checked</span> class <span class="keyword">const</span></span><br><span class="line"><span class="keyword">continue</span> <span class="keyword">decimal</span> <span class="keyword">default</span> <span class="keyword">delegate</span> <span class="keyword">do</span> <span class="keyword">double</span> <span class="keyword">else</span> <span class="keyword">enum</span> <span class="keyword">event</span> <span class="keyword">explicit</span></span><br><span class="line"><span class="keyword">extern</span> <span class="keyword">false</span> <span class="keyword">finally</span> <span class="keyword">fixed</span> <span class="keyword">float</span> <span class="keyword">for</span> <span class="keyword">foreach</span> <span class="keyword">goto</span> <span class="keyword">if</span> <span class="keyword">implicit</span> <span class="keyword">in</span></span><br><span class="line"><span class="title">in</span> (<span class="params">generic modifier</span>) <span class="keyword">int</span> <span class="keyword">interface</span> <span class="keyword">internal</span> <span class="keyword">is</span> <span class="keyword">lock</span> <span class="keyword">long</span> namespace</span><br><span class="line">new <span class="keyword">null</span> <span class="keyword">object</span> <span class="keyword">operator</span> <span class="keyword">out</span> <span class="title">out</span> (<span class="params">generic modifier</span>) <span class="keyword">override</span> <span class="keyword">params</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">protected</span> <span class="keyword">public</span> <span class="keyword">readonly</span> <span class="keyword">ref</span> return <span class="keyword">sbyte</span> <span class="keyword">sealed</span> <span class="keyword">short</span> <span class="keyword">sizeof</span></span><br><span class="line"><span class="keyword">stackalloc</span> <span class="keyword">static</span> <span class="keyword">string</span> <span class="keyword">struct</span> <span class="keyword">switch</span> <span class="keyword">this</span> throw <span class="keyword">true</span> <span class="keyword">try</span> <span class="keyword">typeof</span> <span class="keyword">uint</span></span><br><span class="line"><span class="keyword">ulong</span> <span class="keyword">unchecked</span> <span class="keyword">unsafe</span> <span class="keyword">ushort</span> <span class="keyword">using</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="keyword">volatile</span> <span class="keyword">while</span></span></span><br></pre></td></tr></table></figure>
-<p>เมื่อ alias กับ BCL type ทำงานเหมือนกัน แล้วจะเลือกใช้ตัวไหน? เรื่องนี้มีความเห็นหลายแบบ เช่น</p>
-<p>ใน <a href="https://github.com/dotnet/corefx/blob/master/Documentation/coding-guidelines/coding-style.md" target="_blank" rel="external">C# coding style</a> ของทีม corefx บอกว่าพวกเขาใช้ alias ทั้งหมดทุกกรณี เหตุผลอย่างหนึ่งคือ alias เป็น keyword ประโยชน์ที่ได้จากมันก็คือ สามารถเรียกใช้เมื่อไหร่ก็ได้ โดยไม่ต้องเปิด namespace ใด ๆ แม้ได้ <code>System</code></p>
-<p>บางคนให้ความเห็นว่า engineer ของ Microsoft สร้าง alias เพื่อให้คล้ายกับ C++ เพื่อให้โปรแกรมเมอร์เข้าใจได้ง่าย เป็นแนวคิดเก่า ตอนนี้ก็ควรกลับมาใช้ BCL type ซึ่งเป็น design เริ่มต้นของ C# เสียที <a href="http://stackoverflow.com/questions/7074/whats-the-difference-between-string-and-string" target="_blank" rel="external">[1]</a></p>
-<p>ทำไมถึงควรใช้ BCL type ก็เนื่องจาก Api บางตัวของ .Net ใช้ชื่อเดียวกับ BCL type เช่น <code>Convert.ToSingle</code> ฟังก์ชันนี้ return ค่าเป็น Single (float) สามารถเขียนได้สองแบบ คือ</p>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">float</span> <span class="keyword">value</span> = Convert.ToSingle(<span class="string">"12.0"</span>)</span><br><span class="line">Single <span class="keyword">value</span> = Convert.ToSingle(<span class="string">"12.0"</span>)</span><br></pre></td></tr></table></figure>
-<p>แบบแรก ต้องการ convert เป็น Single แต่กลับ return ค่าออกมาเป็น float<br>แบบที่สอง จะดูตรงไปตรงมา คือ convert เป็น Single และรับค่าด้วย Single</p>
-<p>เรื่องนี้เกี่ยวกับ readability ถึงแม้โค้ดทั้งสองแบบจะทำงานเหมือนกัน แต่แบบที่สองจะเข้าใจได้ง่ายกว่า แม้กับคนที่ไม่เคยเขียน C# ก็ตาม</p>
-<p>ความเห็นอีกแบบคือ ควรใช้ alias เป็นหลัก จะใช้ BCL type ก็ต่อเมื่อมีการอ้างถึงสมาชิกในคลาสเท่านั้น เพราะไม่ make sense ถ้าจะเรียกใช้ method จาก keyword ควรเรียกจาก class มากกว่า</p>
-<p>จากความเห็นข้างต้น สามารถสรุป style การใช้ได้ 3 แบบ คือ</p>
-<p>แบบที่ 1 ใช้ BCL ทั้งหมด</p>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">String text;</span><br><span class="line">String.IsNullOrEmpty(text);</span><br><span class="line">Double number;</span><br><span class="line">Double.TryParse(text, <span class="keyword">out</span> number);</span><br></pre></td></tr></table></figure>
-<p>แบบที่ 2 ใช้ alias ทั้งหมด</p>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">string</span> text;</span><br><span class="line"><span class="keyword">string</span>.IsNullOrEmpty(text);</span><br><span class="line"><span class="keyword">double</span> number;</span><br><span class="line"><span class="keyword">double</span>.TryParse(text, <span class="keyword">out</span> number);</span><br></pre></td></tr></table></figure>
-<p>แบบที่ 3 ใช้ alias ในประโยคประกาศตัวแปร และใช้ BCL เมื่อมีการเรียกใช้ method ใน class</p>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">string</span> text;</span><br><span class="line">String.IsNullOrEmpty(text);</span><br><span class="line"><span class="keyword">double</span> number;</span><br><span class="line">Double.TryParse(text, <span class="keyword">out</span> number);</span><br></pre></td></tr></table></figure>
-<p>Links</p>
-<ol>
-<li><a href="http://haacked.com/archive/2015/12/16/to-string-or-not/" target="_blank" rel="external">To String or to string.</a></li>
-<li><a href="http://stackoverflow.com/questions/7074/whats-the-difference-between-string-and-string" target="_blank" rel="external">What’s the difference between String and string?.</a></li>
-<li><a href="https://github.com/dotnet/corefx/issues/391" target="_blank" rel="external">Language or BCL data types.</a></li>
-</ol>
-
-      
-    </div>
-    
-    
-      <footer class="article-footer">
-        
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/cs/">cs</a></li></ul>
-
-      </footer>
-    
-  </div>
-  
-</article>
-
-
+      <nav id="page-nav">
+        <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
+      </nav>
     </section>
     <footer id="footer">
   
