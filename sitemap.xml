@@ -2,6 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://wk-j.gihub.io/2016/01/30/csharp-explicit-conversion/</loc>
+    <lastmod>2016-02-03T16:03:39.000Z</lastmod>
+  </url>
+  
+  <url>
     <loc>http://wk-j.gihub.io/2016/02/03/csharp-fizz-buzz-using-reactive-extensions/</loc>
     <lastmod>2016-02-03T15:46:54.000Z</lastmod>
   </url>
@@ -19,11 +24,6 @@
   <url>
     <loc>http://wk-j.gihub.io/2016/01/24/fsharp-fizz-buzz/</loc>
     <lastmod>2016-01-31T05:31:10.000Z</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://wk-j.gihub.io/2016/01/30/csharp-explicit-conversion/</loc>
-    <lastmod>2016-01-30T10:33:04.000Z</lastmod>
   </url>
   
   <url>
