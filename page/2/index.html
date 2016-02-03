@@ -61,6 +61,85 @@ ga('send', 'pageview');
   </div>
 </header>
     <section id="main" class="outer">
+      <article id="post-csharp-checked-and-unchecked" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/01/11/csharp-checked-and-unchecked/">Checked กับ Unchecked</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2016/01/11/csharp-checked-and-unchecked/" class="article-date">
+  <time datetime="2016-01-11T11:11:57.000Z" itemprop="datePublished">2016-01-11</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Max__26amp_3B_Min"><a href="#Max__26amp_3B_Min" class="headerlink" title="Max &amp; Min"></a>Max &amp; Min</h2><p>Primitive type ใน C# เช่น short float หรือ int จะมี min และ max value เป็นค่าต่ำสุดและสูงสุดที่เป็นไปได้ ค่านี้ถูกกำหนดโดยจำนวน bit ของ type เช่น int มี 32 bit เลขฐานสองขนาด 32 bit สามารถแสดงตัวเลขได้ถึง 4294967296 แต่เนื่องจาก int เป็น sign integer ต้องใช้ 1 bit สำหรับเก็บ flag + หรือ - ดังนั้น bit ที่ใช้สำหรับเก็บตัวเลขจึงเหลือ 31 bit ทำให้สามารถเก็บค่าต่ำสุดและสูงสุดดังนี้</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">const</span> Int32 MaxValue = <span class="number">2147483647</span>;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">const</span> Int32 MinValue = -<span class="number">2147483648</span>;</span><br></pre></td></tr></table></figure>
+<p>จากปัจจัยนี้ทำให้ int ไม่สามารถใช้เก็บค่าที่ต่ำหรือสูงกว่า min และ max นี้ได้ ถ้าพยายาม assign ค่านอกจาก range นี้ก็จะเกิดสิ่งที่เรียกกว่า overflow</p>
+<p>ภาษาต่าง ๆ จะมีวิธีจัดการกับ overflow ที่ต่างกัน เช่น C, C++ จะไม่สนใจ overflow และไม่ถือว่า overflow คือ error ดังนั้นโปรแกรมเมอร์ ต้องควบคุมจัดการเอง</p>
+<p>ภาษา Visual Basic จะตรวจจับ overflow ขณะทำงาน และจะ throw exception ออกมาเมื่อเจอเคสแบบนี้</p>
+<p>ส่วน C# โดย default จะปิดการตรวจจับ overflow ไว้ คือ unchecked นั่นเอง แต่สามารถเปิดให้ checked ได้ด้วยการ compile ด้วย flag <code>/checked+</code> ซึ่ง compiler จะเพิ่มโค้ดชุดพิเศษแทนที่ชุดปกติ เช่น เปลี่ยน IL instruction จาก <code>add</code> เป็น <code>add.ovf</code></p>
+<h2 id="u0E17_u0E14_u0E2A_u0E2D_u0E1A"><a href="#u0E17_u0E14_u0E2A_u0E2D_u0E1A" class="headerlink" title="ทดสอบ"></a>ทดสอบ</h2><p>มาดูกันว่าโปรแกรม <code>Test.cs</code> ที่จะใช้ทดสอบเมื่อ compile ด้วย flag <code>/checked+</code> โปรแกรมที่ได้นั้นต่างกับโปรแกรมปกติอย่างไร</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Test</span> &#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params">String[] args</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> i = Int32.MaxValue + Int32.Parse(<span class="string">"1"</span>);</span><br><span class="line">        Console.WriteLine(i);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>ลอง compile Test.cs เป็นสองแบบ คือ แบบธรรมดา และแบบมี <code>/checked+</code></p>
+<ol>
+<li>Compile Test.cs เป็น exe ก่อนด้วย dmcs</li>
+<li>Decompile exe ที่ได้จากข้อ 1 ด้วย monodis เพื่อเช็ค IL instruction</li>
+</ol>
+<p>Compile และ decompile แบบธรรมดา</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dmcs -out:Unchecked.exe Unchecked.cs</span><br><span class="line">monodis --output=Unchecked.il Unchecked.exe</span><br></pre></td></tr></table></figure>
+<p>Compile ด้วย <code>/checked+</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dmcs /checked+ -out:Checked.exe Checked.cs</span><br><span class="line">monodis --output=Checked.il Checked.exe</span><br></pre></td></tr></table></figure>
+<h2 id="IL_instruction"><a href="#IL_instruction" class="headerlink" title="IL instruction"></a>IL instruction</h2><p>IL instruction ของโปรแกรมต่างกันอย่างไร</p>
+<p><strong>แบบที่ 1</strong> Unchecked.il ได้จาก Unchecked.exe</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// method line 2</span></span><br><span class="line">.<span class="function">method <span class="keyword">public</span> <span class="keyword">static</span> hidebysig</span><br><span class="line">       <span class="keyword">default</span> <span class="keyword">void</span> <span class="title">Main</span> (<span class="params"><span class="keyword">string</span>[] args</span>)  cil managed</span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="comment">// Method begins at RVA 0x2058</span></span><br><span class="line">.entrypoint</span><br><span class="line"><span class="comment">// Code size 24 (0x18)</span></span><br><span class="line">.maxstack <span class="number">2</span></span><br><span class="line">.<span class="function">locals <span class="title">init</span> (<span class="params"></span><br><span class="line">    int32	V_0</span>)</span><br><span class="line">IL_0000:  ldc.i4 2147483647</span><br><span class="line">IL_0005:  ldstr "1"</span><br><span class="line">IL_000a:  call int32 int32::<span class="title">Parse</span>(<span class="params"><span class="keyword">string</span></span>)</span><br><span class="line">IL_000f:  add</span><br><span class="line">IL_0010:  stloc.0</span><br><span class="line">IL_0011:  ldloc.0</span><br><span class="line">IL_0012:  call <span class="keyword">void</span> class [mscorlib]System.Console::<span class="title">WriteLine</span>(<span class="params">int32</span>)</span><br><span class="line">IL_0017:  ret</span><br><span class="line">&#125; <span class="comment">// end of method Test::Main</span></span></span><br></pre></td></tr></table></figure>
+<p><strong>แบบที่ 2</strong> Checked.il ได้จาก Checked.exe</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// method line 2</span></span><br><span class="line">.<span class="function">method <span class="keyword">public</span> <span class="keyword">static</span> hidebysig</span><br><span class="line">       <span class="keyword">default</span> <span class="keyword">void</span> <span class="title">Main</span> (<span class="params"><span class="keyword">string</span>[] args</span>)  cil managed</span><br><span class="line"></span>&#123;</span><br><span class="line"><span class="comment">// Method begins at RVA 0x2058</span></span><br><span class="line">.entrypoint</span><br><span class="line"><span class="comment">// Code size 24 (0x18)</span></span><br><span class="line">.maxstack <span class="number">2</span></span><br><span class="line">.<span class="function">locals <span class="title">init</span> (<span class="params"></span><br><span class="line">    int32	V_0</span>)</span><br><span class="line">IL_0000:  ldc.i4 2147483647</span><br><span class="line">IL_0005:  ldstr "1"</span><br><span class="line">IL_000a:  call int32 int32::<span class="title">Parse</span>(<span class="params"><span class="keyword">string</span></span>)</span><br><span class="line">IL_000f:  add.ovf</span><br><span class="line">IL_0010:  stloc.0</span><br><span class="line">IL_0011:  ldloc.0</span><br><span class="line">IL_0012:  call <span class="keyword">void</span> class [mscorlib]System.Console::<span class="title">WriteLine</span>(<span class="params">int32</span>)</span><br><span class="line">IL_0017:  ret</span><br><span class="line">&#125; <span class="comment">// end of method Test::Main</span></span></span><br></pre></td></tr></table></figure>
+<p>จะเห็นว่า IL instruction ของทั้งสองโปรแกรมมีหน้าแทบเหมือนกัน ยกเว้นเพียงบรรทัดที่ 14 ที่มี instruction ต่างกัน คือ <code>add</code> กับ <code>add.ovf</code></p>
+<h2 id="u0E01_u0E32_u0E23_u0E17_u0E33_u0E07_u0E32_u0E19"><a href="#u0E01_u0E32_u0E23_u0E17_u0E33_u0E07_u0E32_u0E19" class="headerlink" title="การทำงาน"></a>การทำงาน</h2><p>จาก IL ที่ได้จะเห็นว่า มีเพียง instruction เดียวที่ต่างกัน แล้วโปรแกรมทั้งสองจะทำงานต่างกันหรือไม่</p>
+<p><strong>1. รันโปรแกรมแบบ unchecked</strong></p>
+<p>รันโปรแกรมได้ปกติ ไม่เกิด exception แต่ได้ผลลัพท์ คือ <code>-2147483648</code> ซึ่งผิดคาดจากที่ตั้งใจไว้ ตาม sense การบวกเลขเราน่าจะได้ผลลัพท์ลักษณะนี้ <code>2147483647 + 1 = 21474836478</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ mono Unchecked.exe</span><br><span class="line">-<span class="number">2147483648</span></span><br></pre></td></tr></table></figure>
+<p><strong>2. โปรแกรมแบบ checked</strong></p>
+<p>จะมี error คือ System.OverflowException ซึ่งหมายความว่า CLR ตรวจเจอ overflow จึงทำการ throw exception ออกมา</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ mono Checked.exe</span><br><span class="line"></span><br><span class="line">Unhandled Exception:</span><br><span class="line">System.OverflowException: Arithmetic operation resulted <span class="keyword">in</span> an overflow.</span><br><span class="line">   at Test.Main (System.String[] args) <span class="keyword">in</span> &lt;filename unknown&gt;:line <span class="number">0</span></span><br><span class="line">[ERROR] FATAL UNHANDLED EXCEPTION: System.OverflowException: Arithmetic operation resulted <span class="keyword">in</span> an overflow.</span><br><span class="line">   at Test.Main (System.String[] args) <span class="keyword">in</span> &lt;filename unknown&gt;:line <span class="number">0</span></span><br></pre></td></tr></table></figure>
+<h2 id="u0E2A_u0E23_u0E38_u0E1B"><a href="#u0E2A_u0E23_u0E38_u0E1B" class="headerlink" title="สรุป"></a>สรุป</h2><p>จากการทดสอบจะเห็นว่า โปรแกรมที่ไม่เช็ค overflow สามารถทำงานได้ โดยไม่มี error แต่ผลลัพท์ไม่ถูกต้อง ในการใช้งานจริงโปรแกรมเมอร์ต้องแน่ใจว่า โค้ดที่เขียนจะต้องอยู่ภายใน range ของ type นั้น มิฉะนั้นโปรแกรมก็จะทำงานผิดพลาด</p>
+<p>ส่วนโปรแกรมที่เช็ค overflow ซึ่งโดยปกติจะมีประสิทธิภาพต่ำกว่าแบบ unchecked เล็กน้อย จะมี runtime exception และไม่แสดงผลลัพท์ใด ๆ ในทางปฏิบัติโปรแกรมเมอร์สามารถจัดการ exception ที่เกิดขึ้นโดยใช้ประโยค <code>try ... catch</code> จากนั้นก็เขียนโลจิกเพิ่มเติมเพื่อกัดการกับ error เพื่อช่วยป้องกันความผิดพลาดของโปรแกรม</p>
+<p>สรุปสั้น ๆ คือ</p>
+<ul>
+<li>unchecked เร็วกว่า</li>
+<li>checked ปลอดภัยกว่า</li>
+</ul>
+<h2 id="u0E2B_u0E21_u0E32_u0E22_u0E40_u0E2B_u0E15_u0E38"><a href="#u0E2B_u0E21_u0E32_u0E22_u0E40_u0E2B_u0E15_u0E38" class="headerlink" title="หมายเหตุ"></a>หมายเหตุ</h2><p>นอกจากการใช้ compiler flag <code>/checked+</code> ซึ่งจะมีผลกับ instruction ของทั้งโปรแกรม เราสามารถเขียนโค้ดสำหรับ checked หรือ unchecked overflow เฉพาะส่วนที่ต้องการได้ โดยใช้ operator <code>checked</code> กับ <code>unchecked</code> ตามตัวอย่างนี้</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Test</span> &#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Checked1</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        Int32 i = Int32.MaxValue;</span><br><span class="line">        i = <span class="keyword">checked</span> (i + <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Checked2</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">checked</span> &#123;</span><br><span class="line">            Int32 i = Int32.MaxValue;</span><br><span class="line">            i = i + <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Unchecked</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">unchecked</span> &#123;</span><br><span class="line">            Int32 i = Int32.MaxValue;</span><br><span class="line">            i = i + <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/cs/">cs</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+</article>
+
+
+    
       <article id="post-csharp-keyword-and-bcl" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
