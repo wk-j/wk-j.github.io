@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>เขียน Entity Framework Code First ด้วย F# - wk&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Dependenciesตัวอย่างนี้จะใช้ EF เชื่อมกับฐานข้อมูล PostgreSQL ซึ่งจะต้องใช้ dependencies สองตัว คือ EntityFramework และ Npgsql.EntityFramework สามารถติดตั้งผ่าน Package Manager Console ดังนี้
+12Instal">
+<meta property="og:type" content="article">
+<meta property="og:title" content="เขียน Entity Framework Code First ด้วย F#">
+<meta property="og:url" content="http://wk-j.gihub.io/2016/02/04/fsharp-entity-framework-code-first/index.html">
+<meta property="og:site_name" content="wk's blog">
+<meta property="og:description" content="Dependenciesตัวอย่างนี้จะใช้ EF เชื่อมกับฐานข้อมูล PostgreSQL ซึ่งจะต้องใช้ dependencies สองตัว คือ EntityFramework และ Npgsql.EntityFramework สามารถติดตั้งผ่าน Package Manager Console ดังนี้
+12Instal">
+<meta property="og:updated_time" content="2016-02-04T17:17:39.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="เขียน Entity Framework Code First ด้วย F#">
+<meta name="twitter:description" content="Dependenciesตัวอย่างนี้จะใช้ EF เชื่อมกับฐานข้อมูล PostgreSQL ซึ่งจะต้องใช้ dependencies สองตัว คือ EntityFramework และ Npgsql.EntityFramework สามารถติดตั้งผ่าน Package Manager Console ดังนี้
+12Instal">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+  <link href="/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-72419467-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo" href="/"></a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://wk-j.gihub.io"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-fsharp-entity-framework-code-first" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      เขียน Entity Framework Code First ด้วย F#
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2016/02/04/fsharp-entity-framework-code-first/" class="article-date">
+  <time datetime="2016-02-04T16:19:15.000Z" itemprop="datePublished">2016-02-04</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Dependencies"><a href="#Dependencies" class="headerlink" title="Dependencies"></a>Dependencies</h2><p>ตัวอย่างนี้จะใช้ EF เชื่อมกับฐานข้อมูล PostgreSQL ซึ่งจะต้องใช้ dependencies สองตัว คือ <code>EntityFramework</code> และ <code>Npgsql.EntityFramework</code> สามารถติดตั้งผ่าน Package Manager Console ดังนี้</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Install-Package EntityFramewok</span><br><span class="line">Install-Package Npgsql.EntityFramework</span><br></pre></td></tr></table></figure>
+<h2 id="Config"><a href="#Config" class="headerlink" title="Config"></a>Config</h2><p>ในไฟล์ <code>App.config</code> ต้องเพิ่มแท็ก <code>configSections</code> <code>system.Data</code> <code>entityFramework</code> และ <code>connectionString</code> โดยชื่อ connection ในที่นี่จะใช้คำว่า <code>production</code> พร้อมระบุรายละเอียดของฐานข้อมูลไว้ใน attribute ชื่อ <code>connectionString</code></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="pi">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">configuration</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="title">configSections</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">section</span> <span class="attribute">name</span>=<span class="value">"entityFramework"</span> <span class="attribute">type</span>=<span class="value">"System.Data.Entity.Internal.ConfigFile.EntityFrameworkSection, EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"</span> <span class="attribute">requirePermission</span>=<span class="value">"false"</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="title">configSections</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="title">system.data</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">DbProviderFactories</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="title">remove</span> <span class="attribute">invariant</span>=<span class="value">"Npgsql"</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="title">add</span> <span class="attribute">name</span>=<span class="value">"Npgsql Data Provider"</span> <span class="attribute">invariant</span>=<span class="value">"Npgsql"</span> <span class="attribute">support</span>=<span class="value">"FF"</span> <span class="attribute">description</span>=<span class="value">".Net Framework Data Provider for Postgresql"</span> <span class="attribute">type</span>=<span class="value">"Npgsql.NpgsqlFactory, Npgsql"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">DbProviderFactories</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="title">system.data</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="title">entityFramework</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">defaultConnectionFactory</span> <span class="attribute">type</span>=<span class="value">"System.Data.Entity.Infrastructure.SqlConnectionFactory, EntityFramework"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">providers</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="title">provider</span> <span class="attribute">invariantName</span>=<span class="value">"System.Data.SqlClient"</span> <span class="attribute">type</span>=<span class="value">"System.Data.Entity.SqlServer.SqlProviderServices, EntityFramework.SqlServer"</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="title">provider</span> <span class="attribute">invariantName</span>=<span class="value">"Npgsql"</span> <span class="attribute">type</span>=<span class="value">"Npgsql.NpgsqlServices, Npgsql.EntityFramework"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">providers</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="title">entityFramework</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="title">connectionStrings</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">add</span> <span class="attribute">name</span>=<span class="value">"production"</span> <span class="attribute">providerName</span>=<span class="value">"Npgsql"</span> <span class="attribute">connectionString</span>=<span class="value">"Server=192.168.0.xxx;Port=5432;Database=DbName; User Id=xxx;Password=xxx;"</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="title">connectionStrings</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h2 id="Models"><a href="#Models" class="headerlink" title="Models"></a>Models</h2><p>EF Code First ต้องประกาศ Entity class ในตัวอย่างนี้จะมีเพียงคลาสเดียว คือ <code>QUser</code> ซึ่ง extend จาก abstract class ชื่อ <code>Common</code> ที่ประกาศ primary key ไว้</p>
+<figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="annotation">[&lt;AbstractClass&gt;]</span></span><br><span class="line"><span class="class"><span class="keyword">type</span> <span class="title">Common</span></span>() =</span><br><span class="line">    <span class="annotation">[&lt;Key&gt;]</span></span><br><span class="line">    <span class="keyword">member</span> <span class="keyword">val</span> Id = <span class="number">0</span> <span class="keyword">with</span> get, set</span><br><span class="line"><span class="class"><span class="keyword">type</span> <span class="title">QUser</span></span>() =</span><br><span class="line">    <span class="keyword">inherit</span> Common()</span><br><span class="line">    <span class="keyword">member</span> <span class="keyword">val</span> FirstName = <span class="string">""</span> <span class="keyword">with</span> set,get</span><br><span class="line">    <span class="keyword">member</span> <span class="keyword">val</span> LastName = <span class="string">""</span> <span class="keyword">with</span> set,get</span><br><span class="line">    <span class="keyword">member</span> <span class="keyword">val</span> Position = <span class="string">""</span> <span class="keyword">with</span> set,get</span><br><span class="line">    <span class="keyword">member</span> <span class="keyword">val</span> Email = <span class="string">""</span> <span class="keyword">with</span> set,get</span><br></pre></td></tr></table></figure>
+<h2 id="Context"><a href="#Context" class="headerlink" title="Context"></a>Context</h2><p>Context ใน EF ใช้เป็น interface สำหรับ <code>insert</code> <code>update</code> <code>delete</code> และ  <code>query</code> ข้อมูล โดยการประกาศ context ต้อง inherit class ชื่อ <code>DbContext</code></p>
+<figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">type</span> <span class="title">AppContext</span></span>(connection:string) =</span><br><span class="line">    <span class="keyword">inherit</span> DbContext(connection)</span><br><span class="line">    <span class="annotation">[&lt;DefaultValue&gt;]</span></span><br><span class="line">    <span class="keyword">val</span> <span class="keyword">mutable</span> <span class="keyword">private</span> users: DbSet&lt;QUser&gt;</span><br><span class="line">    <span class="keyword">member</span> this.Users</span><br><span class="line">        <span class="keyword">with</span> get() = this.users</span><br><span class="line">        <span class="keyword">and</span> set v = this.users &lt;- v</span><br></pre></td></tr></table></figure>
+<p><code>AppContext</code> มี parameter 1 ตัวชื่อ <code>connection</code> เพื่อใช้สำหรับส่งชื่อ <code>connection</code> ที่ระบุไว้ในไฟล์ <code>App.config</code></p>
+<h2 id="Create_Schema"><a href="#Create_Schema" class="headerlink" title="Create Schema"></a>Create Schema</h2><p>เมื่อเขียน Entity class และ context ครบแล้ว ต่อไปคือการ generate ฐานข้อมูลให้ได้ table และ field ตรง ที่ตามที่ประกาศไว้ใน Entity class วิธีการคือ ให้เพิ่มโค้ด <code>Database.SetInitializer</code> ก่อนที่จะทำ operation ใด ๆ ก็ตามกับฐานข้อมูล</p>
+<figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Database.SetInitializer&lt;AppContext&gt;</span><br><span class="line">    (<span class="keyword">new</span> DropCreateDatabaseIfModelChanges&lt;AppContext&gt;());</span><br><span class="line"><span class="keyword">use</span> context = <span class="keyword">new</span> AppContext(<span class="string">"production"</span>)</span><br><span class="line"><span class="keyword">let</span> rs = context.Users.Where(<span class="keyword">fun</span> x -&gt; x.FirstName = <span class="string">""</span>).FirstOrDefault()</span><br></pre></td></tr></table></figure>
+<p>จากตัวอย่างใช้วิธีส่งคำสั่ง <code>new DropCreateDatabaseIfModelChanges&lt;AppContext&gt;()</code> ซึ่งหมายความว่าให้ drop ฐานข้อมูลและสร้างใหม่ถ้าตรวจเจอว่า Entity class มีการแก้ไข</p>
+<p>หลังจาก Generate schema เราสามารถ <code>insert</code> <code>update</code> ฐานข้อมูลได้โดยใช้ syntax แบบ LINQ method หรือผ่าน LINQ query ก็ได้ สำหรับ LINQ query จะมี syntax ที่แตกต่างจาก C# สามารถดูตัวอย่างได้ตามลิงค์ด้านล่างนี้</p>
+<p>Links</p>
+<ul>
+<li><a href="http://fsprojects.github.io/FSharp.Linq.ComposableQuery/QueryExamples.html" target="_blank" rel="external">http://fsprojects.github.io/FSharp.Linq.ComposableQuery/QueryExamples.html</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/fs/">fs</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2016/02/03/csharp-fizz-buzz-using-reactive-extensions/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Fizz Buzz โดยใช้ Reactive Extensions&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2016 wk&nbsp;
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>, theme by <a href="http://github.com/ppoffice">PPOffice</a>
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+  </div>
+</body>
+</html>

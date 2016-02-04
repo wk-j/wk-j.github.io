@@ -2,6 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://wk-j.gihub.io/2016/02/04/fsharp-entity-framework-code-first/</loc>
+    <lastmod>2016-02-04T17:17:39.000Z</lastmod>
+  </url>
+  
+  <url>
     <loc>http://wk-j.gihub.io/2016/01/30/csharp-explicit-conversion/</loc>
     <lastmod>2016-02-03T16:03:39.000Z</lastmod>
   </url>

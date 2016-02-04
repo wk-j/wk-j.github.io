@@ -61,6 +61,63 @@ ga('send', 'pageview');
   </div>
 </header>
     <section id="main" class="outer">
+      <article id="post-fsharp-entity-framework-code-first" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/02/04/fsharp-entity-framework-code-first/">เขียน Entity Framework Code First ด้วย F#</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2016/02/04/fsharp-entity-framework-code-first/" class="article-date">
+  <time datetime="2016-02-04T16:19:15.000Z" itemprop="datePublished">2016-02-04</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Dependencies"><a href="#Dependencies" class="headerlink" title="Dependencies"></a>Dependencies</h2><p>ตัวอย่างนี้จะใช้ EF เชื่อมกับฐานข้อมูล PostgreSQL ซึ่งจะต้องใช้ dependencies สองตัว คือ <code>EntityFramework</code> และ <code>Npgsql.EntityFramework</code> สามารถติดตั้งผ่าน Package Manager Console ดังนี้</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Install-Package EntityFramewok</span><br><span class="line">Install-Package Npgsql.EntityFramework</span><br></pre></td></tr></table></figure>
+<h2 id="Config"><a href="#Config" class="headerlink" title="Config"></a>Config</h2><p>ในไฟล์ <code>App.config</code> ต้องเพิ่มแท็ก <code>configSections</code> <code>system.Data</code> <code>entityFramework</code> และ <code>connectionString</code> โดยชื่อ connection ในที่นี่จะใช้คำว่า <code>production</code> พร้อมระบุรายละเอียดของฐานข้อมูลไว้ใน attribute ชื่อ <code>connectionString</code></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="pi">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">configuration</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="title">configSections</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">section</span> <span class="attribute">name</span>=<span class="value">"entityFramework"</span> <span class="attribute">type</span>=<span class="value">"System.Data.Entity.Internal.ConfigFile.EntityFrameworkSection, EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"</span> <span class="attribute">requirePermission</span>=<span class="value">"false"</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="title">configSections</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="title">system.data</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">DbProviderFactories</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="title">remove</span> <span class="attribute">invariant</span>=<span class="value">"Npgsql"</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="title">add</span> <span class="attribute">name</span>=<span class="value">"Npgsql Data Provider"</span> <span class="attribute">invariant</span>=<span class="value">"Npgsql"</span> <span class="attribute">support</span>=<span class="value">"FF"</span> <span class="attribute">description</span>=<span class="value">".Net Framework Data Provider for Postgresql"</span> <span class="attribute">type</span>=<span class="value">"Npgsql.NpgsqlFactory, Npgsql"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">DbProviderFactories</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="title">system.data</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="title">entityFramework</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">defaultConnectionFactory</span> <span class="attribute">type</span>=<span class="value">"System.Data.Entity.Infrastructure.SqlConnectionFactory, EntityFramework"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">providers</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="title">provider</span> <span class="attribute">invariantName</span>=<span class="value">"System.Data.SqlClient"</span> <span class="attribute">type</span>=<span class="value">"System.Data.Entity.SqlServer.SqlProviderServices, EntityFramework.SqlServer"</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="title">provider</span> <span class="attribute">invariantName</span>=<span class="value">"Npgsql"</span> <span class="attribute">type</span>=<span class="value">"Npgsql.NpgsqlServices, Npgsql.EntityFramework"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">providers</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="title">entityFramework</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="title">connectionStrings</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">add</span> <span class="attribute">name</span>=<span class="value">"production"</span> <span class="attribute">providerName</span>=<span class="value">"Npgsql"</span> <span class="attribute">connectionString</span>=<span class="value">"Server=192.168.0.xxx;Port=5432;Database=DbName; User Id=xxx;Password=xxx;"</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="title">connectionStrings</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h2 id="Models"><a href="#Models" class="headerlink" title="Models"></a>Models</h2><p>EF Code First ต้องประกาศ Entity class ในตัวอย่างนี้จะมีเพียงคลาสเดียว คือ <code>QUser</code> ซึ่ง extend จาก abstract class ชื่อ <code>Common</code> ที่ประกาศ primary key ไว้</p>
+<figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="annotation">[&lt;AbstractClass&gt;]</span></span><br><span class="line"><span class="class"><span class="keyword">type</span> <span class="title">Common</span></span>() =</span><br><span class="line">    <span class="annotation">[&lt;Key&gt;]</span></span><br><span class="line">    <span class="keyword">member</span> <span class="keyword">val</span> Id = <span class="number">0</span> <span class="keyword">with</span> get, set</span><br><span class="line"><span class="class"><span class="keyword">type</span> <span class="title">QUser</span></span>() =</span><br><span class="line">    <span class="keyword">inherit</span> Common()</span><br><span class="line">    <span class="keyword">member</span> <span class="keyword">val</span> FirstName = <span class="string">""</span> <span class="keyword">with</span> set,get</span><br><span class="line">    <span class="keyword">member</span> <span class="keyword">val</span> LastName = <span class="string">""</span> <span class="keyword">with</span> set,get</span><br><span class="line">    <span class="keyword">member</span> <span class="keyword">val</span> Position = <span class="string">""</span> <span class="keyword">with</span> set,get</span><br><span class="line">    <span class="keyword">member</span> <span class="keyword">val</span> Email = <span class="string">""</span> <span class="keyword">with</span> set,get</span><br></pre></td></tr></table></figure>
+<h2 id="Context"><a href="#Context" class="headerlink" title="Context"></a>Context</h2><p>Context ใน EF ใช้เป็น interface สำหรับ <code>insert</code> <code>update</code> <code>delete</code> และ  <code>query</code> ข้อมูล โดยการประกาศ context ต้อง inherit class ชื่อ <code>DbContext</code></p>
+<figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">type</span> <span class="title">AppContext</span></span>(connection:string) =</span><br><span class="line">    <span class="keyword">inherit</span> DbContext(connection)</span><br><span class="line">    <span class="annotation">[&lt;DefaultValue&gt;]</span></span><br><span class="line">    <span class="keyword">val</span> <span class="keyword">mutable</span> <span class="keyword">private</span> users: DbSet&lt;QUser&gt;</span><br><span class="line">    <span class="keyword">member</span> this.Users</span><br><span class="line">        <span class="keyword">with</span> get() = this.users</span><br><span class="line">        <span class="keyword">and</span> set v = this.users &lt;- v</span><br></pre></td></tr></table></figure>
+<p><code>AppContext</code> มี parameter 1 ตัวชื่อ <code>connection</code> เพื่อใช้สำหรับส่งชื่อ <code>connection</code> ที่ระบุไว้ในไฟล์ <code>App.config</code></p>
+<h2 id="Create_Schema"><a href="#Create_Schema" class="headerlink" title="Create Schema"></a>Create Schema</h2><p>เมื่อเขียน Entity class และ context ครบแล้ว ต่อไปคือการ generate ฐานข้อมูลให้ได้ table และ field ตรง ที่ตามที่ประกาศไว้ใน Entity class วิธีการคือ ให้เพิ่มโค้ด <code>Database.SetInitializer</code> ก่อนที่จะทำ operation ใด ๆ ก็ตามกับฐานข้อมูล</p>
+<figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Database.SetInitializer&lt;AppContext&gt;</span><br><span class="line">    (<span class="keyword">new</span> DropCreateDatabaseIfModelChanges&lt;AppContext&gt;());</span><br><span class="line"><span class="keyword">use</span> context = <span class="keyword">new</span> AppContext(<span class="string">"production"</span>)</span><br><span class="line"><span class="keyword">let</span> rs = context.Users.Where(<span class="keyword">fun</span> x -&gt; x.FirstName = <span class="string">""</span>).FirstOrDefault()</span><br></pre></td></tr></table></figure>
+<p>จากตัวอย่างใช้วิธีส่งคำสั่ง <code>new DropCreateDatabaseIfModelChanges&lt;AppContext&gt;()</code> ซึ่งหมายความว่าให้ drop ฐานข้อมูลและสร้างใหม่ถ้าตรวจเจอว่า Entity class มีการแก้ไข</p>
+<p>หลังจาก Generate schema เราสามารถ <code>insert</code> <code>update</code> ฐานข้อมูลได้โดยใช้ syntax แบบ LINQ method หรือผ่าน LINQ query ก็ได้ สำหรับ LINQ query จะมี syntax ที่แตกต่างจาก C# สามารถดูตัวอย่างได้ตามลิงค์ด้านล่างนี้</p>
+<p>Links</p>
+<ul>
+<li><a href="http://fsprojects.github.io/FSharp.Linq.ComposableQuery/QueryExamples.html" target="_blank" rel="external">http://fsprojects.github.io/FSharp.Linq.ComposableQuery/QueryExamples.html</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/fs/">fs</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+</article>
+
+
+    
       <article id="post-csharp-fizz-buzz-using-reactive-extensions" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -593,91 +650,6 @@ ga('send', 'pageview');
 <figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Program</span> &#123;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">object</span> <span class="title">CreateInstance</span>(<span class="params">Type t</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> Activator.CreateInstance(t);</span><br><span class="line">        &#125;<span class="keyword">catch</span>(Exception e) &#123;</span><br><span class="line">            WriteLine(e.Message);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> open1 = CreateInstance(<span class="keyword">typeof</span>(GenericStruct&lt;&gt;));</span><br><span class="line">        <span class="keyword">var</span> close1 = CreateInstance(<span class="keyword">typeof</span>(GenericStruct&lt;<span class="keyword">int</span>&gt;));</span><br><span class="line"></span><br><span class="line">        WriteLine(open1 == <span class="keyword">null</span>);                           <span class="comment">// true</span></span><br><span class="line">        WriteLine(close1 != <span class="keyword">null</span>);                          <span class="comment">// true</span></span><br><span class="line">        WriteLine((close1 <span class="keyword">as</span> GenericStruct&lt;<span class="keyword">int</span>&gt;).Name);     <span class="comment">// Int32</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>จากตัวอย่างจะเห็นว่าเราไม่สามารถ สร้าง  instance ของ <code>GenericStruct&lt;&gt;</code> ได้ เนื่องจากไม่ระบุ type argument ไว้ในเครื่องหมาย <code>&lt;&gt;</code> ในบรรทัดที่ <code>14</code> จึงได้ <code>open1</code> มีค่า <code>null</code></p>
 <p>ส่วน closed type <code>GenericStuct&lt;int&gt;</code> สามารถสร้าง instance และแสดงค่า <code>Name</code> ได้ปกติ</p>
-
-      
-    </div>
-    
-    
-      <footer class="article-footer">
-        
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/cs/">cs</a></li></ul>
-
-      </footer>
-    
-  </div>
-  
-</article>
-
-
-    
-      <article id="post-csharp-covariance-and-contravariance" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/01/14/csharp-covariance-and-contravariance/">Covariance กับ Contravariance (Draft)</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-meta">
-      <a href="/2016/01/14/csharp-covariance-and-contravariance/" class="article-date">
-  <time datetime="2016-01-14T08:31:49.000Z" itemprop="datePublished">2016-01-14</time>
-</a>
-      
-      
-    </div>
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p> ใน C# concept ที่เรียกว่า covariance และ contravariance ถูกใช้กับอะไรบ้าง</p>
-<ul>
-<li>ใช้กับ array ในเวอร์ชัน 1.0</li>
-<li>ใช้กับ delegate ในเวอร์ชั่น 2.0</li>
-<li>ใช้กับ generic ในเวอร์ชั่น 4.0</li>
-</ul>
-<h2 id="Substitution"><a href="#Substitution" class="headerlink" title="Substitution"></a>Substitution</h2><p>ก่อนจะรู้จักกับ covariance ต้องทำความเข้าใจกับหลักการ substitution ใน C# เสียก่อน</p>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Animal</span> &#123; .. &#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Cat</span>: <span class="title">Animal</span> &#123; .. &#125;</span><br></pre></td></tr></table></figure>
-<p>จาก class hierarchy จะเห็นว่า Animal เป็น supertype ของ Cat</p>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Animal a = <span class="keyword">new</span> Cat();    <span class="comment">// ok</span></span><br><span class="line">Cat b = <span class="keyword">new</span> Animal();    <span class="comment">// error</span></span><br></pre></td></tr></table></figure>
-<p>จากตัวอย่าง <code>Animal</code> เป็นเซ็ตที่ใหญ่กว่าตามหลัก <em>substitution principle</em> เราสามารถใช้ instance ของ <code>Cat</code> แทน instance ของ <code>Animal</code> ได้ แต่ไม่สามารถใช้ instance ของ <code>Animal</code> แทน <code>Cat</code> ให้นึกภาพว่า เราไม่สามารถนำกล่องที่ใหญ่มาใส่ในกล่องที่เล็กกว่านั่นเอง</p>
-<h2 id="Array"><a href="#Array" class="headerlink" title="Array"></a>Array</h2><p>Array ที่มี element เป็น reference type ใน C# ถือว่าเป็น covariance</p>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Animal[] animals = <span class="keyword">new</span> Cat[<span class="number">10</span>];</span><br></pre></td></tr></table></figure>
-<p>จากตัวอย่าง <code>Animal[]</code> compatible กับ <code>Cat[]</code> สามารถใช้ instance ของ <code>Cat</code> แทน <code>Animal</code> เราเรียกการ assign ค่าที่ type เล็กกว่าอยู่ด้านขวาของเครื่องหมาย <code>=</code> ว่า covariance</p>
-<p>แต่ covariance ของ array เป็น covariance แบบไม่ safe เนื่องจากเราสามารถใส่ instance ของคลาสอื่นนอกเหนือจาก <code>Cat</code> แต่อยู่ hierarch  ถัดจาก <code>Animal</code> ซึ่งจะทำให้เกิด <code>ArrayTypeMismatchException</code> ขณะรัน</p>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Attempted to access an element as a type incompatible with the array.</span></span><br><span class="line">animals[<span class="number">0</span>] = <span class="keyword">new</span> Dog()</span><br></pre></td></tr></table></figure>
-<p>จากตัวอย่างจะเกิด error ขณะรัน เนื่องจาก backing store ของ array ถูกกำหนดให้เก็บ <code>Cat</code> ตั้งแต่ต้น จึงไม่สามารถเก็บ element ที่มี type อื่นได้ ถึงแม้จะเป็น subtype ของ <code>Animal</code> เหมือนกันก็ตาม</p>
-<p>Covariance ใน array ถูก implement ตั้งแต่ C# 1.0 เพื่อให้เหมือนกับ Java ในขณะนั้น ถึงปัจจุบันปัญหา <code>TypeMissMatch</code> ก็ยังอยู่ ไม่สามารถตรวจสอบขณะ compile ได้</p>
-<p>ใน C# รุ่นต่อมา มีการ implement covariance กับส่วนอื่น ซึ่งจะไม่มีปัญหาลักษณะนี้ เนื่องจากมีการออกแบบให้มีความปลอดภัยตั้งแต่ต้น</p>
-<h2 id="Method_group"><a href="#Method_group" class="headerlink" title="Method group"></a>Method group</h2><h4 id="Covariance"><a href="#Covariance" class="headerlink" title="Covariance"></a>Covariance</h4><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Cat <span class="title">MakeCat</span>(<span class="params"></span>) </span>&#123; ... &#125;</span><br><span class="line">Func&lt;Animal&gt; makeAnimal = MakeCat</span><br></pre></td></tr></table></figure>
-<p>Covariant จะทำให้ <code>Func&lt;Animal&gt;</code> compatible กับ <code>MakeCat</code> เนื่องจาก <code>Animal</code> ใหญ่กว่า <code>Cat</code> จำสามารถทำ implicit conversion</p>
-<h4 id="Contravaraince"><a href="#Contravaraince" class="headerlink" title="Contravaraince"></a>Contravaraince</h4><p>ตัวอย่างนี้มีสอง method คือ <code>ShowCat</code> ที่รับ <code>Cat</code> เป็น parameter และ <code>Animal</code> ที่รับ <code>Animal</code> เป็น parameter</p>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">ShowCat</span>(<span class="params">Cat c</span>) </span>&#123;&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">ShowAnimal</span>(<span class="params">Animal c</span>) </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
-<p>จากตัวอย่างเราสามารถ assign method ไปยัง delegate <code>Action</code> ได้ดังนี้</p>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Action&lt;Cat&gt; action2 = ShowAnimal;   <span class="comment">// legal</span></span><br><span class="line">Action&lt;Animal&gt; action1 = ShowCat;   <span class="comment">// illegal</span></span><br></pre></td></tr></table></figure>
-<p>จากหลัก <em>substution principle</em> <code>Cat</code> นั้นเล็กว่า <code>Animal</code></p>
-<ul>
-<li>บรรทัดแรก <code>Action&lt;Cat&gt;</code> compatible กับ <code>ShowAnimal</code> เนื่องจาก เราสามารถใช้ <code>Cat</code> แทน <code>Animal</code> ได้ ในตัวอย่างนี้ถึงแม้จะใช้หลัก <code>substitution</code> เหมือนเดิม แต่ทิศทางการ assign ค่าด้วยเครื่องหมาย <code>=</code> จะกลับข้างกัน เราเรียก operation ลักษณะนี้ว่า <code>contravariance</code>  </li>
-<li>บรรทัดที่สอง <code>Action&lt;Animal&gt;</code> ไม่สามารถใช้แทน <code>ShowCat</code> ได้ เนื่องจากจะผิดหลัก <code>substitution</code> เพราะว่า <code>Animal</code> ใหญ่กว่า <code>Cat</code> จึงไม่สามารถใช้ <code>Animal</code> แทน <code>Cat</code> นั่นเอง</li>
-</ul>
-<h2 id="Generic_delegate"><a href="#Generic_delegate" class="headerlink" title="Generic delegate"></a>Generic delegate</h2><p>ใน C# 4.0 มีสิ่งที่เรียกว่า safe generic variant ที่ใช้ได้กับ interface และ delegate</p>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">delegate</span> TResult Func&lt;<span class="keyword">in</span> T, <span class="keyword">out</span> TResult&gt;(T arg);</span><br></pre></td></tr></table></figure>
-<p>จากตัวอย่าง เราสามารถประกาศ delegate ชื่อ <code>Func</code> ที่มี type parameter ตัวแรกเป็น contravariance <code>T</code> และมี type parameter ตัวที่สองเป็น covariance <code>TResult</code></p>
-<ul>
-<li>ใช้ keyword <code>in</code> เพื่อระบุว่า type parameter เป็น contravariance</li>
-<li>ใช้ keyword <code>out</code> เพื่อระบุว่า type parameter เป็น variance</li>
-</ul>
-<p>เรียกใช้งาน</p>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Func&lt;Animal, Cat&gt; f1 = (x) =&gt; <span class="keyword">new</span> Cat();</span><br><span class="line">Func&lt;Cat,Animal&gt; f2 = f1;</span><br></pre></td></tr></table></figure>
-<p><code>Func&lt;Animl,Cat&gt;</code> compatible กับ <code>Func&lt;Cat, Animal&gt;</code> เนื่องจากจาก type parameter ตัวแรกเป็น contravariance <code>Cat</code> ซึ่งเป็น type ที่เล็กกว่าจึงสามารถส่งเข้าไปในฟังก์ชั่นแทน <code>Animal</code> ส่วน type parameter ตัวที่สองเป็น covariance เราจึงใช้ <code>Animal</code> เพื่อรับค่าแทน <code>Cat</code> ที่ return มาจากฟังกํชั่นได้เช่นเดียวกัน</p>
-<p>Links</p>
-<ul>
-<li><a href="http://tomasp.net/blog/variance-explained.aspx" target="_blank" rel="external">The theory behind covariance and contravariance in C# 4</a></li>
-<li><a href="https://blogs.msdn.microsoft.com/ericlippert/2007/10/16/covariance-and-contravariance-in-c-part-one/" target="_blank" rel="external">Covariance and Contravariance in C#</a></li>
-</ul>
 
       
     </div>
