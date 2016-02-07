@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>ฟังก์ชัน Fold กับ Reduce - wk&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="ใน F# มีฟังก์ชั่นที่ใช้สำหรับ aggregate ข้อมูลคล้ายกับ Aggregate ของ LINQ คือ fold กับ reduce
+Aggregate ใน C#.123var data = new int[] &amp;#123; 1,2,3&amp;#125;;var sum = data.Aggregate(0, (acc,x) =&amp;gt; acc +">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ฟังก์ชัน Fold กับ Reduce">
+<meta property="og:url" content="http://wk-j.gihub.io/2016/02/07/fsharp-reduce-and-fold/index.html">
+<meta property="og:site_name" content="wk's blog">
+<meta property="og:description" content="ใน F# มีฟังก์ชั่นที่ใช้สำหรับ aggregate ข้อมูลคล้ายกับ Aggregate ของ LINQ คือ fold กับ reduce
+Aggregate ใน C#.123var data = new int[] &amp;#123; 1,2,3&amp;#125;;var sum = data.Aggregate(0, (acc,x) =&amp;gt; acc +">
+<meta property="og:updated_time" content="2016-02-07T11:07:14.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ฟังก์ชัน Fold กับ Reduce">
+<meta name="twitter:description" content="ใน F# มีฟังก์ชั่นที่ใช้สำหรับ aggregate ข้อมูลคล้ายกับ Aggregate ของ LINQ คือ fold กับ reduce
+Aggregate ใน C#.123var data = new int[] &amp;#123; 1,2,3&amp;#125;;var sum = data.Aggregate(0, (acc,x) =&amp;gt; acc +">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+  <link href="/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-72419467-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo" href="/"></a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://wk-j.gihub.io"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-fsharp-reduce-and-fold" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      ฟังก์ชัน Fold กับ Reduce
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2016/02/07/fsharp-reduce-and-fold/" class="article-date">
+  <time datetime="2016-02-07T09:30:31.000Z" itemprop="datePublished">2016-02-07</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p> ใน F# มีฟังก์ชั่นที่ใช้สำหรับ aggregate ข้อมูลคล้ายกับ <code>Aggregate</code> ของ LINQ คือ <code>fold</code> กับ <code>reduce</code></p>
+<h2 id="Aggregate__u0E43_u0E19_C_23"><a href="#Aggregate__u0E43_u0E19_C_23" class="headerlink" title="Aggregate ใน C#."></a>Aggregate ใน C#.</h2><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> data = <span class="keyword">new</span> <span class="keyword">int</span>[] &#123; <span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>&#125;;</span><br><span class="line"><span class="keyword">var</span> sum = data.Aggregate(<span class="number">0</span>, (acc,x) =&gt; acc + x); <span class="comment">// sum = 6</span></span><br><span class="line"><span class="keyword">var</span> pro = data.Aggregate(<span class="number">1</span>, (acc,x) =&gt; acc * x); <span class="comment">// pro = 6</span></span><br></pre></td></tr></table></figure>
+<h2 id="Fold"><a href="#Fold" class="headerlink" title="Fold"></a>Fold</h2><figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">open</span> System.Linq</span><br><span class="line"><span class="keyword">let</span> data = [|<span class="number">1</span>;<span class="number">2</span>;<span class="number">3</span>|]</span><br><span class="line"><span class="keyword">let</span> sum = Array.fold (<span class="keyword">fun</span> acc x -&gt; acc + x) <span class="number">0</span> data <span class="comment">// sum = 6</span></span><br><span class="line"><span class="keyword">let</span> pro = Array.fold (<span class="keyword">fun</span> acc x -&gt; acc * x) <span class="number">1</span> data <span class="comment">// pro = 6</span></span><br></pre></td></tr></table></figure>
+<p>ฟังก์ชั่น <code>fold</code> รับ parameter ทั้งหมด 3 ตัว คือ</p>
+<ul>
+<li><em>folder</em>  คือ ฟังก์ชันสำหรับ transform หรือ update state</li>
+<li><em>state</em> คือ initial value หรือค่าเริ่มต้นที่จะถูกใช้ในฟังก์ชัน <em>folder</em></li>
+<li><em>input</em> คือ ข้อมูลที่ต้องการ process</li>
+</ul>
+<h2 id="Reduce"><a href="#Reduce" class="headerlink" title="Reduce"></a>Reduce</h2><figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> data = [<span class="number">1</span>;<span class="number">2</span>;<span class="number">3</span>]</span><br><span class="line"><span class="keyword">let</span> empty = []</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> sum1 = List.reduce(<span class="keyword">fun</span> acc x -&gt; acc + x) data   <span class="comment">// sum1 = 6</span></span><br><span class="line"><span class="keyword">let</span> sum2 = List.reduce(<span class="keyword">fun</span> acc x -&gt; acc + x) empty  <span class="comment">// ERROR: The input list was empty.</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> sum3 = List.fold(<span class="keyword">fun</span> acc x -&gt; acc + x) <span class="number">0</span> data   <span class="comment">// sum3 = 6</span></span><br><span class="line"><span class="keyword">let</span> sum4 = List.fold(<span class="keyword">fun</span> acc x -&gt; acc + x) <span class="number">0</span> empty  <span class="comment">// sum4 = 0</span></span><br></pre></td></tr></table></figure>
+<p>ฟังก์ชั่น <code>reduce</code> จะคล้ายกับ <code>fold</code> ต่างกันที่เราไม่สามารถใส่ state หรือ initial value แบบ explicit ได้ <code>fold</code> จึงต้องดึง element ตัวแรกของ input เป็น initial value เสมอ ทำให้เกิดข้อจำกัด คือ ข้อมูล input จำเป็นต้องมีอย่างน้อย 1 element มิฉะนั้นจะเกิด error <code>System.ArgumentException: The input list was empty</code></p>
+<p>ความแตกต่างอีกข้อคือ initial value ที่ใสในฟังก์ชั่น <code>fold</code> สามารถเป็น type ใดก็ได้ ส่งผลให้ลัพท์สุดท้ายไม่จำเป็นต้องเป็น type เดียวกับ input element จะแตกต่างจาก <code>reduce</code> ที่ output ต้องเป็น type เดียวกับ input element เสมอ</p>
+<figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">1</span> .. <span class="number">3</span>] |&gt; List.fold (<span class="keyword">fun</span> str n -&gt; str + <span class="string">","</span> + (string n)) <span class="string">""</span> <span class="comment">// ,1,2,3</span></span><br></pre></td></tr></table></figure>
+<p>Links</p>
+<ul>
+<li><a href="http://stackoverflow.com/questions/9055837/difference-between-fold-and-reduce" target="_blank" rel="external">http://stackoverflow.com/questions/9055837/difference-between-fold-and-reduce</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/fs/">fs</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2016/02/04/fsharp-entity-framework-code-first/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">เขียน Entity Framework Code First ด้วย F#&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2016 wk&nbsp;
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>, theme by <a href="http://github.com/ppoffice">PPOffice</a>
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+  </div>
+</body>
+</html>

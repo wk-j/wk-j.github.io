@@ -61,6 +61,63 @@ ga('send', 'pageview');
   </div>
 </header>
     <section id="main" class="outer">
+      <article id="post-fsharp-reduce-and-fold" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/02/07/fsharp-reduce-and-fold/">ฟังก์ชัน Fold กับ Reduce</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2016/02/07/fsharp-reduce-and-fold/" class="article-date">
+  <time datetime="2016-02-07T09:30:31.000Z" itemprop="datePublished">2016-02-07</time>
+</a>
+      
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p> ใน F# มีฟังก์ชั่นที่ใช้สำหรับ aggregate ข้อมูลคล้ายกับ <code>Aggregate</code> ของ LINQ คือ <code>fold</code> กับ <code>reduce</code></p>
+<h2 id="Aggregate__u0E43_u0E19_C_23"><a href="#Aggregate__u0E43_u0E19_C_23" class="headerlink" title="Aggregate ใน C#."></a>Aggregate ใน C#.</h2><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> data = <span class="keyword">new</span> <span class="keyword">int</span>[] &#123; <span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>&#125;;</span><br><span class="line"><span class="keyword">var</span> sum = data.Aggregate(<span class="number">0</span>, (acc,x) =&gt; acc + x); <span class="comment">// sum = 6</span></span><br><span class="line"><span class="keyword">var</span> pro = data.Aggregate(<span class="number">1</span>, (acc,x) =&gt; acc * x); <span class="comment">// pro = 6</span></span><br></pre></td></tr></table></figure>
+<h2 id="Fold"><a href="#Fold" class="headerlink" title="Fold"></a>Fold</h2><figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">open</span> System.Linq</span><br><span class="line"><span class="keyword">let</span> data = [|<span class="number">1</span>;<span class="number">2</span>;<span class="number">3</span>|]</span><br><span class="line"><span class="keyword">let</span> sum = Array.fold (<span class="keyword">fun</span> acc x -&gt; acc + x) <span class="number">0</span> data <span class="comment">// sum = 6</span></span><br><span class="line"><span class="keyword">let</span> pro = Array.fold (<span class="keyword">fun</span> acc x -&gt; acc * x) <span class="number">1</span> data <span class="comment">// pro = 6</span></span><br></pre></td></tr></table></figure>
+<p>ฟังก์ชั่น <code>fold</code> รับ parameter ทั้งหมด 3 ตัว คือ</p>
+<ul>
+<li><em>folder</em>  คือ ฟังก์ชันสำหรับ transform หรือ update state</li>
+<li><em>state</em> คือ initial value หรือค่าเริ่มต้นที่จะถูกใช้ในฟังก์ชัน <em>folder</em></li>
+<li><em>input</em> คือ ข้อมูลที่ต้องการ process</li>
+</ul>
+<h2 id="Reduce"><a href="#Reduce" class="headerlink" title="Reduce"></a>Reduce</h2><figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> data = [<span class="number">1</span>;<span class="number">2</span>;<span class="number">3</span>]</span><br><span class="line"><span class="keyword">let</span> empty = []</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> sum1 = List.reduce(<span class="keyword">fun</span> acc x -&gt; acc + x) data   <span class="comment">// sum1 = 6</span></span><br><span class="line"><span class="keyword">let</span> sum2 = List.reduce(<span class="keyword">fun</span> acc x -&gt; acc + x) empty  <span class="comment">// ERROR: The input list was empty.</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> sum3 = List.fold(<span class="keyword">fun</span> acc x -&gt; acc + x) <span class="number">0</span> data   <span class="comment">// sum3 = 6</span></span><br><span class="line"><span class="keyword">let</span> sum4 = List.fold(<span class="keyword">fun</span> acc x -&gt; acc + x) <span class="number">0</span> empty  <span class="comment">// sum4 = 0</span></span><br></pre></td></tr></table></figure>
+<p>ฟังก์ชั่น <code>reduce</code> จะคล้ายกับ <code>fold</code> ต่างกันที่เราไม่สามารถใส่ state หรือ initial value แบบ explicit ได้ <code>fold</code> จึงต้องดึง element ตัวแรกของ input เป็น initial value เสมอ ทำให้เกิดข้อจำกัด คือ ข้อมูล input จำเป็นต้องมีอย่างน้อย 1 element มิฉะนั้นจะเกิด error <code>System.ArgumentException: The input list was empty</code></p>
+<p>ความแตกต่างอีกข้อคือ initial value ที่ใสในฟังก์ชั่น <code>fold</code> สามารถเป็น type ใดก็ได้ ส่งผลให้ลัพท์สุดท้ายไม่จำเป็นต้องเป็น type เดียวกับ input element จะแตกต่างจาก <code>reduce</code> ที่ output ต้องเป็น type เดียวกับ input element เสมอ</p>
+<figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">1</span> .. <span class="number">3</span>] |&gt; List.fold (<span class="keyword">fun</span> str n -&gt; str + <span class="string">","</span> + (string n)) <span class="string">""</span> <span class="comment">// ,1,2,3</span></span><br></pre></td></tr></table></figure>
+<p>Links</p>
+<ul>
+<li><a href="http://stackoverflow.com/questions/9055837/difference-between-fold-and-reduce" target="_blank" rel="external">http://stackoverflow.com/questions/9055837/difference-between-fold-and-reduce</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+      <footer class="article-footer">
+        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/fs/">fs</a></li></ul>
+
+      </footer>
+    
+  </div>
+  
+</article>
+
+
+    
       <article id="post-fsharp-entity-framework-code-first" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -609,57 +666,6 @@ ga('send', 'pageview');
       
     </div>
     
-    
-  </div>
-  
-</article>
-
-
-    
-      <article id="post-csharp-open-and-close-types" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/01/14/csharp-open-and-close-types/">Open กับ Closed Type</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-meta">
-      <a href="/2016/01/14/csharp-open-and-close-types/" class="article-date">
-  <time datetime="2016-01-14T15:54:15.000Z" itemprop="datePublished">2016-01-14</time>
-</a>
-      
-      
-    </div>
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>การใช้งาน generic ถ้าระบุ type argument ครบจำนวนที่ประกาศไว้ในเครื่องหมาย  <code>&lt;&gt;</code> เราจะเรียก type นั้นว่า closed type ถ้ามีการระบุไว้เพียงบางส่วน จะเรียกว่า structured type แต่ถ้าไม่ระบุ type argument เลยจะเรียกว่า open type</p>
-<h2 id="u0E04_u0E27_u0E32_u0E21_u0E41_u0E15_u0E01_u0E15_u0E48_u0E32_u0E07_u0E23_u0E30_u0E2B_u0E27_u0E48_u0E32_u0E07_open__u0E41_u0E25_u0E30_closed_type"><a href="#u0E04_u0E27_u0E32_u0E21_u0E41_u0E15_u0E01_u0E15_u0E48_u0E32_u0E07_u0E23_u0E30_u0E2B_u0E27_u0E48_u0E32_u0E07_open__u0E41_u0E25_u0E30_closed_type" class="headerlink" title="ความแตกต่างระหว่าง open และ closed type"></a>ความแตกต่างระหว่าง open และ closed type</h2><ul>
-<li>Open type ถือว่าเป็น type ที่ไม่สมบูรณ์ จึงไม่สามารถสร้าง instance ได้ แต่สามารถใช้เป็น input ของ operator <code>typeof</code></li>
-<li>Close type สามารถสร้าง instance ได้เหมือนคลาสทั่วไป</li>
-</ul>
-<h2 id="u0E15_u0E31_u0E27_u0E2D_u0E22_u0E48_u0E32_u0E07"><a href="#u0E15_u0E31_u0E27_u0E2D_u0E22_u0E48_u0E32_u0E07" class="headerlink" title="ตัวอย่าง"></a>ตัวอย่าง</h2><p>สร้าง GenericStruct เป็น generic type ง่าย ๆ โดยมีการระบุเงื่อนไขว่า type argument ต้องเป็น value type เท่านั้น</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">using System;</span><br><span class="line">using System.Runtime.InteropServices;</span><br><span class="line">using static System.Console;</span><br><span class="line"></span><br><span class="line">public class GenericStruct&lt;T&gt; where T: struct &#123;</span><br><span class="line">    public string Name &#123;</span><br><span class="line">        get &#123;</span><br><span class="line">            return typeof(T).Name;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="u0E17_u0E14_u0E2A_u0E2D_u0E1A"><a href="#u0E17_u0E14_u0E2A_u0E2D_u0E1A" class="headerlink" title="ทดสอบ"></a>ทดสอบ</h2><p>ทดสอบว่าสามารถสร้าง instance ของ open และ closed type ผ่าน <code>Activator.CreateInstance</code> ได้หรือไม่</p>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Program</span> &#123;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">object</span> <span class="title">CreateInstance</span>(<span class="params">Type t</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> Activator.CreateInstance(t);</span><br><span class="line">        &#125;<span class="keyword">catch</span>(Exception e) &#123;</span><br><span class="line">            WriteLine(e.Message);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> open1 = CreateInstance(<span class="keyword">typeof</span>(GenericStruct&lt;&gt;));</span><br><span class="line">        <span class="keyword">var</span> close1 = CreateInstance(<span class="keyword">typeof</span>(GenericStruct&lt;<span class="keyword">int</span>&gt;));</span><br><span class="line"></span><br><span class="line">        WriteLine(open1 == <span class="keyword">null</span>);                           <span class="comment">// true</span></span><br><span class="line">        WriteLine(close1 != <span class="keyword">null</span>);                          <span class="comment">// true</span></span><br><span class="line">        WriteLine((close1 <span class="keyword">as</span> GenericStruct&lt;<span class="keyword">int</span>&gt;).Name);     <span class="comment">// Int32</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>จากตัวอย่างจะเห็นว่าเราไม่สามารถ สร้าง  instance ของ <code>GenericStruct&lt;&gt;</code> ได้ เนื่องจากไม่ระบุ type argument ไว้ในเครื่องหมาย <code>&lt;&gt;</code> ในบรรทัดที่ <code>14</code> จึงได้ <code>open1</code> มีค่า <code>null</code></p>
-<p>ส่วน closed type <code>GenericStuct&lt;int&gt;</code> สามารถสร้าง instance และแสดงค่า <code>Name</code> ได้ปกติ</p>
-
-      
-    </div>
-    
-    
-      <footer class="article-footer">
-        
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/cs/">cs</a></li></ul>
-
-      </footer>
     
   </div>
   

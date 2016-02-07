@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="http://wk-j.gihub.io/"/>
-  <updated>2016-02-04T17:17:39.000Z</updated>
+  <updated>2016-02-07T11:07:14.000Z</updated>
   <id>http://wk-j.gihub.io/</id>
   
   <author>
@@ -13,6 +13,38 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[ฟังก์ชัน Fold กับ Reduce]]></title>
+    <link href="http://wk-j.gihub.io/2016/02/07/fsharp-reduce-and-fold/"/>
+    <id>http://wk-j.gihub.io/2016/02/07/fsharp-reduce-and-fold/</id>
+    <published>2016-02-07T09:30:31.000Z</published>
+    <updated>2016-02-07T11:07:14.000Z</updated>
+    <content type="html"><![CDATA[<p> ใน F# มีฟังก์ชั่นที่ใช้สำหรับ aggregate ข้อมูลคล้ายกับ <code>Aggregate</code> ของ LINQ คือ <code>fold</code> กับ <code>reduce</code></p>
+<h2 id="Aggregate__u0E43_u0E19_C_23"><a href="#Aggregate__u0E43_u0E19_C_23" class="headerlink" title="Aggregate ใน C#."></a>Aggregate ใน C#.</h2><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> data = <span class="keyword">new</span> <span class="keyword">int</span>[] &#123; <span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>&#125;;</span><br><span class="line"><span class="keyword">var</span> sum = data.Aggregate(<span class="number">0</span>, (acc,x) =&gt; acc + x); <span class="comment">// sum = 6</span></span><br><span class="line"><span class="keyword">var</span> pro = data.Aggregate(<span class="number">1</span>, (acc,x) =&gt; acc * x); <span class="comment">// pro = 6</span></span><br></pre></td></tr></table></figure>
+<h2 id="Fold"><a href="#Fold" class="headerlink" title="Fold"></a>Fold</h2><figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">open</span> System.Linq</span><br><span class="line"><span class="keyword">let</span> data = [|<span class="number">1</span>;<span class="number">2</span>;<span class="number">3</span>|]</span><br><span class="line"><span class="keyword">let</span> sum = Array.fold (<span class="keyword">fun</span> acc x -&gt; acc + x) <span class="number">0</span> data <span class="comment">// sum = 6</span></span><br><span class="line"><span class="keyword">let</span> pro = Array.fold (<span class="keyword">fun</span> acc x -&gt; acc * x) <span class="number">1</span> data <span class="comment">// pro = 6</span></span><br></pre></td></tr></table></figure>
+<p>ฟังก์ชั่น <code>fold</code> รับ parameter ทั้งหมด 3 ตัว คือ</p>
+<ul>
+<li><em>folder</em>  คือ ฟังก์ชันสำหรับ transform หรือ update state</li>
+<li><em>state</em> คือ initial value หรือค่าเริ่มต้นที่จะถูกใช้ในฟังก์ชัน <em>folder</em></li>
+<li><em>input</em> คือ ข้อมูลที่ต้องการ process</li>
+</ul>
+<h2 id="Reduce"><a href="#Reduce" class="headerlink" title="Reduce"></a>Reduce</h2><figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> data = [<span class="number">1</span>;<span class="number">2</span>;<span class="number">3</span>]</span><br><span class="line"><span class="keyword">let</span> empty = []</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> sum1 = List.reduce(<span class="keyword">fun</span> acc x -&gt; acc + x) data   <span class="comment">// sum1 = 6</span></span><br><span class="line"><span class="keyword">let</span> sum2 = List.reduce(<span class="keyword">fun</span> acc x -&gt; acc + x) empty  <span class="comment">// ERROR: The input list was empty.</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> sum3 = List.fold(<span class="keyword">fun</span> acc x -&gt; acc + x) <span class="number">0</span> data   <span class="comment">// sum3 = 6</span></span><br><span class="line"><span class="keyword">let</span> sum4 = List.fold(<span class="keyword">fun</span> acc x -&gt; acc + x) <span class="number">0</span> empty  <span class="comment">// sum4 = 0</span></span><br></pre></td></tr></table></figure>
+<p>ฟังก์ชั่น <code>reduce</code> จะคล้ายกับ <code>fold</code> ต่างกันที่เราไม่สามารถใส่ state หรือ initial value แบบ explicit ได้ <code>fold</code> จึงต้องดึง element ตัวแรกของ input เป็น initial value เสมอ ทำให้เกิดข้อจำกัด คือ ข้อมูล input จำเป็นต้องมีอย่างน้อย 1 element มิฉะนั้นจะเกิด error <code>System.ArgumentException: The input list was empty</code></p>
+<p>ความแตกต่างอีกข้อคือ initial value ที่ใสในฟังก์ชั่น <code>fold</code> สามารถเป็น type ใดก็ได้ ส่งผลให้ลัพท์สุดท้ายไม่จำเป็นต้องเป็น type เดียวกับ input element จะแตกต่างจาก <code>reduce</code> ที่ output ต้องเป็น type เดียวกับ input element เสมอ</p>
+<figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">1</span> .. <span class="number">3</span>] |&gt; List.fold (<span class="keyword">fun</span> str n -&gt; str + <span class="string">","</span> + (string n)) <span class="string">""</span> <span class="comment">// ,1,2,3</span></span><br></pre></td></tr></table></figure>
+<p>Links</p>
+<ul>
+<li><a href="http://stackoverflow.com/questions/9055837/difference-between-fold-and-reduce" target="_blank" rel="external">http://stackoverflow.com/questions/9055837/difference-between-fold-and-reduce</a></li>
+</ul>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p> ใน F# มีฟังก์ชั่นที่ใช้สำหรับ aggregate ข้อมูลคล้ายกับ <code>Aggregate</code> ของ LINQ คือ <code>fold</code> กับ <code>reduce</code></p>]]>
+    </summary>
+    
+      <category term="fs" scheme="http://wk-j.gihub.io/tags/fs/"/>
+    
+  </entry>
   
   <entry>
     <title><![CDATA[เขียน Entity Framework Code First ด้วย F#]]></title>
