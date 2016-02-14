@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="http://wk-j.gihub.io/"/>
-  <updated>2016-02-13T17:29:40.000Z</updated>
+  <updated>2016-02-14T16:00:50.000Z</updated>
   <id>http://wk-j.gihub.io/</id>
   
   <author>
@@ -13,6 +13,27 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[อัปเดต String ด้วย Pointer]]></title>
+    <link href="http://wk-j.gihub.io/2016/02/14/csharp-mutate-string-with-unsafe-code/"/>
+    <id>http://wk-j.gihub.io/2016/02/14/csharp-mutate-string-with-unsafe-code/</id>
+    <published>2016-02-14T09:11:10.000Z</published>
+    <updated>2016-02-14T16:00:50.000Z</updated>
+    <content type="html"><![CDATA[<h2 id="Note"><a href="#Note" class="headerlink" title="Note"></a>Note</h2><p>String เป็น immutable type ที่ไม่มี public api สำหรับแก้ไขข้อมูล เราจึงไม่สามารถเปลี่ยนค่าใน memory ที่เก็บ string ได้ ในกรณีที่มีการ assign ค่าใหม่ CLR จะสร้าง string ชุดใหม่เก็บใน memory ตำแหน่งใหม่</p>
+<h2 id="Pointer"><a href="#Pointer" class="headerlink" title="Pointer"></a>Pointer</h2><p>ใน C# ไม่มี type ไหนเป็น immutable ที่สมบูรณ์ เนื่องจากเราสามารถใช้ pointer เข้าถึงตำแหน่งใน memory ได้โดยตรง การใช้ pointer ใน C# ต้องทำใน unsafe block เท่านั้น</p>
+<h2 id="u0E15_u0E31_u0E27_u0E2D_u0E22_u0E48_u0E32_u0E07"><a href="#u0E15_u0E31_u0E27_u0E2D_u0E22_u0E48_u0E32_u0E07" class="headerlink" title="ตัวอย่าง"></a>ตัวอย่าง</h2><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Test</span> &#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">string</span> <span class="title">T</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">string</span> s = <span class="string">"cat"</span>;</span><br><span class="line">        <span class="keyword">unsafe</span> &#123;</span><br><span class="line">            <span class="keyword">fixed</span> (<span class="keyword">char</span>* i = s) &#123;</span><br><span class="line">                *i = <span class="string">'b'</span>;</span><br><span class="line">                <span class="keyword">char</span>* p2 = i + <span class="number">1</span>;</span><br><span class="line">                *p2 = <span class="string">'o'</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> s;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">Test.T(); <span class="comment">// bot</span></span><br></pre></td></tr></table></figure>
+<h2 id="Links"><a href="#Links" class="headerlink" title="Links"></a>Links</h2><ul>
+<li><a href="http://blog.paranoidcoding.com/2014/10/15/invalid-uses-of-a-type.html" target="_blank" rel="external">http://blog.paranoidcoding.com/2014/10/15/invalid-uses-of-a-type.html</a></li>
+<li><a href="http://stackoverflow.com/questions/8176585/unsafe-code-to-change-length-by-mutation-of-a-string-object" target="_blank" rel="external">http://stackoverflow.com/questions/8176585/unsafe-code-to-change-length-by-mutation-of-a-string-object</a></li>
+<li><a href="https://msdn.microsoft.com/en-us/library/ms228599.aspx" target="_blank" rel="external">https://msdn.microsoft.com/en-us/library/ms228599.aspx</a></li>
+</ul>
+]]></content>
+    <summary type="html">
+    <![CDATA[<h2 id="Note"><a href="#Note" class="headerlink" title="Note"></a>Note</h2><p>String เป็น immutable type ที่ไม่มี public api สำหรับแก้ไขข้อม]]>
+    </summary>
+    
+  </entry>
   
   <entry>
     <title><![CDATA[สร้าง Instance ด้วย Lambda Expression]]></title>
