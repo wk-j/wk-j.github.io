@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="http://wk-j.gihub.io/"/>
-  <updated>2016-02-14T16:00:50.000Z</updated>
+  <updated>2016-03-10T15:38:38.000Z</updated>
   <id>http://wk-j.gihub.io/</id>
   
   <author>
@@ -13,6 +13,40 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[เขียน Windows Service ด้วย  F#]]></title>
+    <link href="http://wk-j.gihub.io/2016/03/10/fsharp-create-windows-service/"/>
+    <id>http://wk-j.gihub.io/2016/03/10/fsharp-create-windows-service/</id>
+    <published>2016-03-10T15:15:14.000Z</published>
+    <updated>2016-03-10T15:38:38.000Z</updated>
+    <content type="html"><![CDATA[<h2 id="Dependencies"><a href="#Dependencies" class="headerlink" title="Dependencies"></a>Dependencies</h2><ul>
+<li><code>System.ServiceProcess</code></li>
+<li><code>System.Configuration.Install</code></li>
+</ul>
+<h2 id="Service"><a href="#Service" class="headerlink" title="Service"></a>Service</h2><p>เขียน Service โดย extend คลาสที่ชื่อ <code>ServiceBase</code> และ override <code>OnStart()</code> และ <code>OnStop()</code> ซึ่งเป็นฟังก์ชันที่จะถูกเรียกเมื่อมีการ Start/Stop service</p>
+<figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">type</span> <span class="title">WindowsService</span></span>() =</span><br><span class="line">    <span class="keyword">inherit</span> ServiceBase()</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mutable</span> service : IDisposable = <span class="keyword">null</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> x.OnStart(args) =</span><br><span class="line">        <span class="keyword">let</span> url = LoadAppConfig().Uri</span><br><span class="line">        service &lt;- WebApp.Start&lt;Startup.Startup&gt;(url)</span><br><span class="line">        <span class="keyword">base</span>.OnStart(args)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> x.OnStop() =</span><br><span class="line">        <span class="keyword">if</span> obj.ReferenceEquals(<span class="keyword">null</span>, service) |&gt; not <span class="keyword">then</span> service.Dispose()</span><br><span class="line">        <span class="keyword">base</span>.OnStop()</span><br></pre></td></tr></table></figure>
+<h2 id="Installer"><a href="#Installer" class="headerlink" title="Installer"></a>Installer</h2><p>Installer เป็นคลาสที่ใช้สำหรับระบุรายละเอียดของ Service เช่น ชื่อ Service วิธีการ Start จะให้ Start แบบ Auto หรือ Manual สามารถเขียน Installer โดย extend คลาส <code>Installer</code> และระบุ attribute <code>RunInstaller</code> ไว้ที่ชื่อคลาส</p>
+<figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="annotation">[&lt;RunInstaller(true)&gt;]</span></span><br><span class="line"><span class="class"><span class="keyword">type</span> <span class="title">MyInstaller</span></span>() <span class="keyword">as</span> this =</span><br><span class="line">    <span class="keyword">inherit</span> Installer()</span><br><span class="line">    <span class="keyword">do</span></span><br><span class="line">        <span class="keyword">let</span> spi = <span class="keyword">new</span> ServiceProcessInstaller()</span><br><span class="line">        <span class="keyword">let</span> si = <span class="keyword">new</span> ServiceInstaller()</span><br><span class="line">        spi.Account &lt;- ServiceAccount.LocalSystem</span><br><span class="line">        spi.Username &lt;- <span class="keyword">null</span></span><br><span class="line">        spi.Password &lt;- <span class="keyword">null</span></span><br><span class="line">        si.DisplayName &lt;- <span class="string">"MyService"</span></span><br><span class="line">        si.Description &lt;- <span class="string">"MyService"</span></span><br><span class="line">        si.StartType &lt;- ServiceStartMode.Automatic</span><br><span class="line">        si.ServiceName &lt;- <span class="string">"MyService"</span></span><br><span class="line">        this.Installers.Add(spi) |&gt; ignore</span><br><span class="line">        this.Installers.Add(si) |&gt; ignore</span><br></pre></td></tr></table></figure>
+<h2 id="Entry_Point"><a href="#Entry_Point" class="headerlink" title="Entry Point"></a>Entry Point</h2><p>หลังจากเขียน Service และ Installer แล้ว ใน EntryPoint ของโปรแกรม สามารถเรียก Service โดยใช้ Static Method <code>Run</code> ของคลาส <code>ServiceBase</code></p>
+<figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="annotation">[&lt;EntryPoint&gt;]</span></span><br><span class="line"><span class="keyword">let</span> main argv =</span><br><span class="line">    <span class="keyword">use</span> service = <span class="keyword">new</span> WindowsService()</span><br><span class="line">    ServiceBase.Run(service)</span><br><span class="line">    <span class="number">0</span></span><br></pre></td></tr></table></figure>
+<h2 id="Install_/_Uninstall_Script"><a href="#Install_/_Uninstall_Script" class="headerlink" title="Install / Uninstall Script"></a>Install / Uninstall Script</h2><p>เมื่อ Compile โปรแกรมเป็น .exe แล้ว สามารถติดตั้งโปรแกรมให้รันเป็น Windows Service โดยใช้ utility ที่มาพร้อมกัน .Net Framework คือ <code>installutil.exe</code></p>
+<ul>
+<li>ใช้ option <code>/I</code> สำหรับติดตั้ง</li>
+<li>ใช้ option <code>/U</code> สำหรับ Uninstall</li>
+</ul>
+<h3 id="Install_Service"><a href="#Install_Service" class="headerlink" title="Install Service"></a>Install Service</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"C:\Windows\Microsoft.NET\Framework\v4.0.30319\installutil.exe"</span> /I <span class="string">"%~dp0MyService.exe"</span></span><br></pre></td></tr></table></figure>
+<h3 id="Uninstall_ServiceName"><a href="#Uninstall_ServiceName" class="headerlink" title="Uninstall ServiceName"></a>Uninstall ServiceName</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"C:\Windows\Microsoft.NET\Framework\v4.0.30319\installutil.exe"</span> /U <span class="string">"%~dp0MyService.exe"</span></span><br></pre></td></tr></table></figure>
+<p>การบุชื่อโปรแกรมจะต้องใช้ Absolute path จากตัวอย่างจะใช้ ตัวแปร <code>%-dp0</code> เพื่อดึง path เต็มของโปรแกรม</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<h2 id="Dependencies"><a href="#Dependencies" class="headerlink" title="Dependencies"></a>Dependencies</h2><ul>
+<li><code>System.ServiceProc]]>
+    </summary>
+    
+      <category term="fs" scheme="http://wk-j.gihub.io/tags/fs/"/>
+    
+  </entry>
   
   <entry>
     <title><![CDATA[อัปเดต String ด้วย Pointer]]></title>
